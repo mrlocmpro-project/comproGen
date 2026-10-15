@@ -10,8 +10,9 @@ import { Spread03Team } from './components/spreads/Spread03Team';
 import { Spread04Legal } from './components/spreads/Spread04Legal';
 import { Spread05Portfolio } from './components/spreads/Spread05Portfolio';
 import { Spread06BackCover } from './components/spreads/Spread06BackCover';
-import { Sliders, Printer, Grid, ChevronLeft, ChevronRight, Layers, Palette } from 'lucide-react';
+import { Sliders, Printer, Grid, ChevronLeft, ChevronRight, Layers, Palette, Info } from 'lucide-react';
 import { FloatingTextToolbar } from './components/editor/FloatingTextToolbar';
+import { AboutModal } from './components/AboutModal';
 
 export default function App() {
   const [data, setData] = useState<CompanyProfileData>(defaultCompanyData);
@@ -32,6 +33,7 @@ export default function App() {
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [editorOpen, setEditorOpen] = useState<boolean>(true);
   const [zoom, setZoom] = useState<number>(100);
+  const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
 
   const activeThemeMeta = getThemeMeta(currentTheme);
 
@@ -74,14 +76,12 @@ export default function App() {
     };
 
     window.addEventListener('afterprint', restoreTitle, { once: true });
-    // Safety fallback in case afterprint does not fire in certain browser contexts
     setTimeout(restoreTitle, 4000);
 
     document.title = printTitle;
     window.print();
   };
 
-  // Synchronize document.title when printing is triggered via keyboard shortcut (Ctrl+P)
   useEffect(() => {
     let savedTitle = document.title;
 
@@ -174,9 +174,8 @@ export default function App() {
 
       {/* Main Workspace Stage */}
       <main
-        className={`w-full pt-14 flex-1 flex flex-col transition-all duration-300 ${
-          editorOpen ? 'lg:pl-[420px]' : ''
-        }`}
+        className={`w-full pt-14 flex-1 flex flex-col transition-all duration-300 ${editorOpen ? 'lg:pl-[420px]' : ''
+          }`}
       >
         {/* Document Controller Sub-Ribbon (Editorial Context) */}
         <div className="doc-info-bar w-full bg-white border-b border-zinc-200 px-4 md:px-8 py-2 no-print flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
@@ -309,9 +308,8 @@ export default function App() {
 
             {/* FULL DOSSIER CONTAINER (Active pages for Full View and @media print) */}
             <div
-              className={`dossier-print-container w-full flex-col gap-10 items-center print:gap-0 print:m-0 print:p-0 ${
-                activeSpread === 'all' ? 'flex' : 'hidden print:block'
-              }`}
+              className={`dossier-print-container w-full flex-col gap-10 items-center print:gap-0 print:m-0 print:p-0 ${activeSpread === 'all' ? 'flex' : 'hidden print:block'
+                }`}
             >
               {pageVisibility.cover && (
                 <Spread01Cover
@@ -382,6 +380,17 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 flex-wrap justify-end">
+              {/* Tombol ABOUT MODAL */}
+              <button
+                type="button"
+                onClick={() => setIsAboutOpen(true)}
+                className="px-3 py-1.5 border border-zinc-300 hover:border-[#1c1917] bg-white text-[#1c1917] hover:bg-zinc-100 transition-colors font-sans text-xs uppercase font-bold flex items-center gap-1.5 shadow-xs"
+                title="Informasi Pembuat & Aplikasi"
+              >
+                <Info className="w-3.5 h-3.5 text-amber-500" />
+                <span>ABOUT</span>
+              </button>
+
               {!editorOpen && (
                 <button
                   type="button"
@@ -408,12 +417,20 @@ export default function App() {
         {/* Global Footer (No Print) */}
         <footer className="w-full bg-zinc-50 border-t border-zinc-200 py-3 px-4 md:px-8 no-print text-xs font-sans text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <span className="font-bold text-[#1c1917]">ARCHITECTURAL MONOGRAPH PUBLICATION ENGINE</span>
+            <span className="font-bold text-[#1c1917]">COMPROGEN ENGINE</span>
             <span className="text-zinc-300">/</span>
-            <span>A4 COMPLIANT (210 × 297 MM) // 5 STRUCTURAL THEMES</span>
+            <span>A4 COMPLIANT // EDITORIAL PUBLISHER</span>
           </div>
           <div className="flex items-center gap-3">
-            <span>© 2026 HEAVY CIVIL & ARCHITECTURAL ARCHIVE</span>
+            <button
+              type="button"
+              onClick={() => setIsAboutOpen(true)}
+              className="hover:text-amber-600 font-semibold transition-colors"
+            >
+              CREATED BY : ECP CORP
+            </button>
+            <span className="text-zinc-300">|</span>
+            <span>© 2026 ECP CORP</span>
             <span className="bg-[#1c1917] text-white px-2 py-0.5 font-bold uppercase text-[10px]">
               {activeThemeMeta.id.toUpperCase()}
             </span>
@@ -423,6 +440,9 @@ export default function App() {
 
       {/* Floating Text Editor Toolbar on Text Selection */}
       <FloatingTextToolbar targetContainerSelector=".spread-viewport-canvas" />
+
+      {/* About App & Copyright Modal */}
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );
 }
