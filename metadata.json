@@ -1,0 +1,6 @@
+{
+  "name": "Heavy Industry Architectural Monograph Engine",
+  "description": "Interactive Swiss-grid InDesign-standard editorial company profile publisher with live forms, zero-gap adaptive reflow, and A4 print export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
