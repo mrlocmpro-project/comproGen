@@ -87,6 +87,9 @@ export const getDefaultCoverYearFineTune = (themeId?: ThemeId): CoverYearFineTun
       fontSize: 28,
       verticalAlign: 'middle',
       showBadge: true,
+      yearOffsetX: 0,
+      yearOffsetY: 0,
+      yearFontSize: 28,
     };
   }
   return {
@@ -95,5 +98,8 @@ export const getDefaultCoverYearFineTune = (themeId?: ThemeId): CoverYearFineTun
     fontSize: 28,
     verticalAlign: 'top',
     showBadge: true,
+    yearOffsetX: 0,
+    yearOffsetY: 0,
+    yearFontSize: 28,
   };
 };

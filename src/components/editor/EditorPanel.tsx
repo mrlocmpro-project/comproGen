@@ -110,28 +110,107 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     });
   };
 
-  const currentFineTune: CoverYearFineTune =
-    data.coverYearFineTune || getDefaultCoverYearFineTune(currentTheme);
+  const yearOffsetX =
+    data.yearOffsetX ?? data.coverYearFineTune?.yearOffsetX ?? data.coverYearFineTune?.xOffset ?? 0;
+  const yearOffsetY =
+    data.yearOffsetY ?? data.coverYearFineTune?.yearOffsetY ?? data.coverYearFineTune?.yOffset ?? 0;
+  const yearFontSize =
+    data.yearFontSize ?? data.coverYearFineTune?.yearFontSize ?? data.coverYearFineTune?.fontSize ?? 28;
+  const showBadge =
+    data.showBadge !== undefined ? data.showBadge : (data.coverYearFineTune?.showBadge !== false);
+
+  const currentFineTune: CoverYearFineTune = {
+    xOffset: yearOffsetX,
+    yOffset: yearOffsetY,
+    fontSize: yearFontSize,
+    showBadge: showBadge,
+    verticalAlign:
+      data.coverYearFineTune?.verticalAlign ||
+      getDefaultCoverYearFineTune(currentTheme).verticalAlign,
+    yearOffsetX,
+    yearOffsetY,
+    yearFontSize,
+  };
 
   const updateFineTune = (patch: Partial<CoverYearFineTune>) => {
-    updateField('coverYearFineTune', {
-      ...currentFineTune,
-      ...patch,
+    const nextOffsetX =
+      patch.yearOffsetX !== undefined
+        ? patch.yearOffsetX
+        : patch.xOffset !== undefined
+        ? patch.xOffset
+        : yearOffsetX;
+    const nextOffsetY =
+      patch.yearOffsetY !== undefined
+        ? patch.yearOffsetY
+        : patch.yOffset !== undefined
+        ? patch.yOffset
+        : yearOffsetY;
+    const nextFontSize =
+      patch.yearFontSize !== undefined
+        ? patch.yearFontSize
+        : patch.fontSize !== undefined
+        ? patch.fontSize
+        : yearFontSize;
+    const nextShowBadge =
+      patch.showBadge !== undefined ? patch.showBadge : showBadge;
+    const nextVAlign =
+      patch.verticalAlign !== undefined
+        ? patch.verticalAlign
+        : currentFineTune.verticalAlign;
+
+    onChange({
+      ...data,
+      yearOffsetX: nextOffsetX,
+      yearOffsetY: nextOffsetY,
+      yearFontSize: nextFontSize,
+      showBadge: nextShowBadge,
+      coverYearFineTune: {
+        xOffset: nextOffsetX,
+        yOffset: nextOffsetY,
+        fontSize: nextFontSize,
+        showBadge: nextShowBadge,
+        verticalAlign: nextVAlign,
+        yearOffsetX: nextOffsetX,
+        yearOffsetY: nextOffsetY,
+        yearFontSize: nextFontSize,
+      },
     });
   };
 
   const handleResetFineTune = () => {
-    updateField('coverYearFineTune', getDefaultCoverYearFineTune(currentTheme));
+    const defaultTheme = getDefaultCoverYearFineTune(currentTheme);
+    const defaultX = defaultTheme.yearOffsetX ?? defaultTheme.xOffset ?? 0;
+    const defaultY = defaultTheme.yearOffsetY ?? defaultTheme.yOffset ?? 0;
+    const defaultFontSize = defaultTheme.yearFontSize ?? defaultTheme.fontSize ?? 28;
+    const defaultShowBadge = defaultTheme.showBadge ?? true;
+
+    onChange({
+      ...data,
+      yearOffsetX: defaultX,
+      yearOffsetY: defaultY,
+      yearFontSize: defaultFontSize,
+      showBadge: defaultShowBadge,
+      coverYearFineTune: {
+        ...defaultTheme,
+        xOffset: defaultX,
+        yOffset: defaultY,
+        fontSize: defaultFontSize,
+        showBadge: defaultShowBadge,
+        yearOffsetX: defaultX,
+        yearOffsetY: defaultY,
+        yearFontSize: defaultFontSize,
+      },
+    });
   };
 
   // Centralized Page Visibility State synchronized with both data.pageVisibility & toggles
   const pageVisibility: PageVisibility = {
-    cover: data.pageVisibility?.cover ?? toggles.showCover ?? true,
-    about: data.pageVisibility?.about ?? toggles.showAbout ?? true,
-    team: data.pageVisibility?.team ?? toggles.showTeam ?? true,
-    legal: data.pageVisibility?.legal ?? toggles.showLegal ?? true,
-    portfolio: data.pageVisibility?.portfolio ?? toggles.showProjects ?? true,
-    backCover: data.pageVisibility?.backCover ?? toggles.showBackCover ?? true,
+    cover: data.pageVisibility?.cover ?? data.showCover ?? toggles.showCover ?? true,
+    about: data.pageVisibility?.about ?? data.showAbout ?? toggles.showAbout ?? true,
+    team: data.pageVisibility?.team ?? data.showTeam ?? toggles.showTeam ?? true,
+    legal: data.pageVisibility?.legal ?? data.showLegal ?? toggles.showLegal ?? true,
+    portfolio: data.pageVisibility?.portfolio ?? data.showPortfolio ?? toggles.showPortfolio ?? toggles.showProjects ?? true,
+    backCover: data.pageVisibility?.backCover ?? data.showBackCover ?? toggles.showBackCover ?? true,
   };
 
   const togglePageVisibility = (pageKey: keyof PageVisibility) => {
@@ -146,7 +225,10 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     if (pageKey === 'about') togglesPatch.showAbout = nextVal;
     if (pageKey === 'team') togglesPatch.showTeam = nextVal;
     if (pageKey === 'legal') togglesPatch.showLegal = nextVal;
-    if (pageKey === 'portfolio') togglesPatch.showProjects = nextVal;
+    if (pageKey === 'portfolio') {
+      togglesPatch.showPortfolio = nextVal;
+      togglesPatch.showProjects = nextVal;
+    }
     if (pageKey === 'backCover') togglesPatch.showBackCover = nextVal;
 
     onTogglesChange({
@@ -154,8 +236,17 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
       ...togglesPatch,
     });
 
+    const dataPatch: Partial<CompanyProfileData> = {};
+    if (pageKey === 'cover') dataPatch.showCover = nextVal;
+    if (pageKey === 'about') dataPatch.showAbout = nextVal;
+    if (pageKey === 'team') dataPatch.showTeam = nextVal;
+    if (pageKey === 'legal') dataPatch.showLegal = nextVal;
+    if (pageKey === 'portfolio') dataPatch.showPortfolio = nextVal;
+    if (pageKey === 'backCover') dataPatch.showBackCover = nextVal;
+
     onChange({
       ...data,
+      ...dataPatch,
       pageVisibility: newVisibility,
     });
   };
@@ -188,7 +279,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 {title}
               </span>
               <span
-                className={`font-mono text-[9px] px-1.5 py-0.2 border ${
+                className={`font-sans text-[9px] px-1.5 py-0.2 border ${
                   isVisible
                     ? 'bg-amber-400 text-black border-amber-500 font-bold'
                     : 'bg-zinc-200 text-zinc-600 border-zinc-300 font-semibold'
@@ -224,15 +315,40 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   };
 
   const handleToggle = (key: keyof TogglesState) => {
+    const nextVal = !toggles[key];
     onTogglesChange({
       ...toggles,
-      [key]: !toggles[key],
+      [key]: nextVal,
     });
+
+    if (key === 'showCover') {
+      onChange({ ...data, showCover: nextVal, pageVisibility: { ...pageVisibility, cover: nextVal } });
+    } else if (key === 'showAbout') {
+      onChange({ ...data, showAbout: nextVal, pageVisibility: { ...pageVisibility, about: nextVal } });
+    } else if (key === 'showTeam') {
+      onChange({ ...data, showTeam: nextVal, pageVisibility: { ...pageVisibility, team: nextVal } });
+    } else if (key === 'showLegal') {
+      onChange({ ...data, showLegal: nextVal, pageVisibility: { ...pageVisibility, legal: nextVal } });
+    } else if (key === 'showPortfolio' || key === 'showProjects') {
+      onChange({ ...data, showPortfolio: nextVal, pageVisibility: { ...pageVisibility, portfolio: nextVal } });
+    } else if (key === 'showBackCover') {
+      onChange({ ...data, showBackCover: nextVal, pageVisibility: { ...pageVisibility, backCover: nextVal } });
+    }
   };
 
   // Export JSON
   const handleExportJson = () => {
-    const jsonStr = JSON.stringify(data, null, 2);
+    const exportData: CompanyProfileData = {
+      ...data,
+      showCover: pageVisibility.cover,
+      showAbout: pageVisibility.about,
+      showTeam: pageVisibility.team,
+      showLegal: pageVisibility.legal,
+      showPortfolio: pageVisibility.portfolio,
+      showBackCover: pageVisibility.backCover,
+      pageVisibility: { ...pageVisibility },
+    };
+    const jsonStr = JSON.stringify(exportData, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -244,7 +360,17 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
   // Copy JSON
   const handleCopyJson = () => {
-    const jsonStr = JSON.stringify(data, null, 2);
+    const exportData: CompanyProfileData = {
+      ...data,
+      showCover: pageVisibility.cover,
+      showAbout: pageVisibility.about,
+      showTeam: pageVisibility.team,
+      showLegal: pageVisibility.legal,
+      showPortfolio: pageVisibility.portfolio,
+      showBackCover: pageVisibility.backCover,
+      pageVisibility: { ...pageVisibility },
+    };
+    const jsonStr = JSON.stringify(exportData, null, 2);
     navigator.clipboard.writeText(jsonStr);
     setCopiedNotification(true);
     setTimeout(() => setCopiedNotification(false), 2500);
@@ -258,18 +384,56 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
       if (!parsed.companyName || !parsed.portfolio) {
         throw new Error('Format JSON tidak sesuai struktur profil perusahaan.');
       }
-      if (parsed.pageVisibility) {
-        onTogglesChange({
-          ...toggles,
-          showCover: parsed.pageVisibility.cover ?? true,
-          showAbout: parsed.pageVisibility.about ?? true,
-          showTeam: parsed.pageVisibility.team ?? true,
-          showLegal: parsed.pageVisibility.legal ?? true,
-          showProjects: parsed.pageVisibility.portfolio ?? true,
-          showBackCover: parsed.pageVisibility.backCover ?? true,
-        });
-      }
-      onChange(parsed);
+      const pageVis = {
+        cover: parsed.pageVisibility?.cover ?? parsed.showCover ?? true,
+        about: parsed.pageVisibility?.about ?? parsed.showAbout ?? true,
+        team: parsed.pageVisibility?.team ?? parsed.showTeam ?? true,
+        legal: parsed.pageVisibility?.legal ?? parsed.showLegal ?? true,
+        portfolio: parsed.pageVisibility?.portfolio ?? parsed.showPortfolio ?? parsed.showProjects ?? true,
+        backCover: parsed.pageVisibility?.backCover ?? parsed.showBackCover ?? true,
+      };
+
+      onTogglesChange({
+        ...toggles,
+        showCover: pageVis.cover,
+        showAbout: pageVis.about,
+        showTeam: pageVis.team,
+        showLegal: pageVis.legal,
+        showPortfolio: pageVis.portfolio,
+        showProjects: pageVis.portfolio,
+        showBackCover: pageVis.backCover,
+      });
+
+      const importedData: CompanyProfileData = {
+        ...parsed,
+        showCover: pageVis.cover,
+        showAbout: pageVis.about,
+        showTeam: pageVis.team,
+        showLegal: pageVis.legal,
+        showPortfolio: pageVis.portfolio,
+        showBackCover: pageVis.backCover,
+        pageVisibility: pageVis,
+        yearOffsetX:
+          parsed.yearOffsetX ??
+          parsed.coverYearFineTune?.yearOffsetX ??
+          parsed.coverYearFineTune?.xOffset ??
+          0,
+        yearOffsetY:
+          parsed.yearOffsetY ??
+          parsed.coverYearFineTune?.yearOffsetY ??
+          parsed.coverYearFineTune?.yOffset ??
+          0,
+        yearFontSize:
+          parsed.yearFontSize ??
+          parsed.coverYearFineTune?.yearFontSize ??
+          parsed.coverYearFineTune?.fontSize ??
+          28,
+        showBadge:
+          parsed.showBadge !== undefined
+            ? parsed.showBadge
+            : parsed.coverYearFineTune?.showBadge !== false,
+      };
+      onChange(importedData);
       setImportModalOpen(false);
       setImportJsonText('');
     } catch (err: any) {
@@ -288,18 +452,56 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
         if (!parsed.companyName) {
           throw new Error('Format data tidak dikenali.');
         }
-        if (parsed.pageVisibility) {
-          onTogglesChange({
-            ...toggles,
-            showCover: parsed.pageVisibility.cover ?? true,
-            showAbout: parsed.pageVisibility.about ?? true,
-            showTeam: parsed.pageVisibility.team ?? true,
-            showLegal: parsed.pageVisibility.legal ?? true,
-            showProjects: parsed.pageVisibility.portfolio ?? true,
-            showBackCover: parsed.pageVisibility.backCover ?? true,
-          });
-        }
-        onChange(parsed);
+        const pageVis = {
+          cover: parsed.pageVisibility?.cover ?? parsed.showCover ?? true,
+          about: parsed.pageVisibility?.about ?? parsed.showAbout ?? true,
+          team: parsed.pageVisibility?.team ?? parsed.showTeam ?? true,
+          legal: parsed.pageVisibility?.legal ?? parsed.showLegal ?? true,
+          portfolio: parsed.pageVisibility?.portfolio ?? parsed.showPortfolio ?? parsed.showProjects ?? true,
+          backCover: parsed.pageVisibility?.backCover ?? parsed.showBackCover ?? true,
+        };
+
+        onTogglesChange({
+          ...toggles,
+          showCover: pageVis.cover,
+          showAbout: pageVis.about,
+          showTeam: pageVis.team,
+          showLegal: pageVis.legal,
+          showPortfolio: pageVis.portfolio,
+          showProjects: pageVis.portfolio,
+          showBackCover: pageVis.backCover,
+        });
+
+        const importedData: CompanyProfileData = {
+          ...parsed,
+          showCover: pageVis.cover,
+          showAbout: pageVis.about,
+          showTeam: pageVis.team,
+          showLegal: pageVis.legal,
+          showPortfolio: pageVis.portfolio,
+          showBackCover: pageVis.backCover,
+          pageVisibility: pageVis,
+          yearOffsetX:
+            parsed.yearOffsetX ??
+            parsed.coverYearFineTune?.yearOffsetX ??
+            parsed.coverYearFineTune?.xOffset ??
+            0,
+          yearOffsetY:
+            parsed.yearOffsetY ??
+            parsed.coverYearFineTune?.yearOffsetY ??
+            parsed.coverYearFineTune?.yOffset ??
+            0,
+          yearFontSize:
+            parsed.yearFontSize ??
+            parsed.coverYearFineTune?.yearFontSize ??
+            parsed.coverYearFineTune?.fontSize ??
+            28,
+          showBadge:
+            parsed.showBadge !== undefined
+              ? parsed.showBadge
+              : parsed.coverYearFineTune?.showBadge !== false,
+        };
+        onChange(importedData);
         setImportModalOpen(false);
       } catch (err: any) {
         alert('Gagal memuat preset: ' + err.message);
@@ -415,7 +617,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
   return (
     <>
       <aside
-        className="no-print fixed top-14 left-0 bottom-0 w-[420px] max-w-[95vw] bg-white border-r border-zinc-200 z-50 flex flex-col shadow-2xl transition-transform duration-300"
+        className="editor-panel font-sans no-print fixed top-14 left-0 bottom-0 w-[420px] max-w-[95vw] bg-white border-r border-zinc-200 z-50 flex flex-col shadow-2xl transition-transform duration-300"
         aria-label="Editor Monograf Arsitektural"
       >
         {/* Editor Header */}
@@ -423,7 +625,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-[#f59e0b] block"></span>
             <div>
-              <div className="text-xs font-mono font-bold tracking-widest text-[#f59e0b] uppercase">
+              <div className="text-xs font-sans font-bold tracking-widest text-[#f59e0b] uppercase">
                 LEFT EDITOR PANEL
               </div>
               <div className="text-[11px] text-zinc-400">Live InDesign Parameters</div>
@@ -448,7 +650,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
         </div>
 
         {/* Tab Navigation Strip (7 Document Tabs + Presets) */}
-        <div className="flex bg-zinc-100 border-b border-zinc-200 overflow-x-auto custom-scrollbar shrink-0 text-xs font-mono">
+        <div className="flex bg-zinc-100 border-b border-zinc-200 overflow-x-auto custom-scrollbar shrink-0 text-xs font-sans">
           <button
             onClick={() => {
               setActiveTab('cover');
@@ -590,7 +792,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               {/* Cover Tab Header Card */}
               <div className="p-3 bg-zinc-900 text-white border-l-4 border-amber-500">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                  <span className="font-sans text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
                     01. SAMPUL / COVER ARCHITECTURAL MONOGRAPH
                   </span>
                   <button
@@ -610,11 +812,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 bg-zinc-50 border border-zinc-200 space-y-3">
                 <div className="text-[11px] font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-200 pb-1.5 flex items-center justify-between">
                   <span>Identitas &amp; Tipografi Sampul</span>
-                  <span className="text-[10px] text-amber-600 font-mono">LIVE EDIT</span>
+                  <span className="text-[10px] text-amber-600 font-sans">LIVE EDIT</span>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                  <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                     Nama Perusahaan (PT / CV / Perseroan)
                   </label>
                   <input
@@ -627,7 +829,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                  <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                     Bentuk Badan Hukum (Legal Entity)
                   </label>
                   <input
@@ -640,7 +842,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                  <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                     Tipe Dokumen (Cover Document Type)
                   </label>
                   <input
@@ -662,7 +864,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         key={pill}
                         type="button"
                         onClick={() => updateField('coverDocumentType', pill)}
-                        className={`text-[9px] px-2 py-0.5 border font-mono transition-colors ${
+                        className={`text-[9px] px-2 py-0.5 border font-sans transition-colors ${
                           (data.coverDocumentType || 'COMPANY PROFILE') === pill
                             ? 'bg-amber-500 text-black border-amber-600 font-bold'
                             : 'bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500'
@@ -675,7 +877,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                  <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                     Tagline / Sub-judul Sampul
                   </label>
                   <input
@@ -689,10 +891,10 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[10px] font-mono uppercase text-zinc-600">
+                    <label className="block text-[10px] font-sans uppercase text-zinc-600">
                       Tahun Dokumen / Periode Fiskal
                     </label>
-                    <span className="text-[9px] text-emerald-600 font-mono font-bold">
+                    <span className="text-[9px] text-emerald-600 font-sans font-bold">
                       Tema Adaptif
                     </span>
                   </div>
@@ -701,7 +903,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     value={data.fiscalYear}
                     onChange={(e) => updateField('fiscalYear', e.target.value)}
                     placeholder="2026 / 2027"
-                    className="w-full px-2.5 py-1.5 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-sans font-bold"
                   />
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {['2026', '2026 / 2027', '2028', '2029', '2026–2030'].map((yr) => (
@@ -709,7 +911,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         key={yr}
                         type="button"
                         onClick={() => updateField('fiscalYear', yr)}
-                        className={`text-[9px] px-2 py-0.5 border font-mono transition-colors ${
+                        className={`text-[9px] px-2 py-0.5 border font-sans transition-colors ${
                           data.fiscalYear === yr
                             ? 'bg-amber-500 text-black border-amber-600 font-bold'
                             : 'bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500'
@@ -723,7 +925,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     Contoh: tema Swiss Tangerine menampilkan <strong>/{data.fiscalYear || '2029'}</strong>, tema Cyber Crimson menampilkan tipografi raksasa <strong>{data.fiscalYear ? data.fiscalYear.split('/')[0].trim() : '2028'}</strong>, dan tema Tech Navy &amp; Sage menampilkan di Folio Header.
                   </p>
 
-                  {/* SUB-SECTION COLLAPSIBLE: PENGATURAN POSISI & TIPOGRAFI TAHUN (FINE-TUNING) */}
+                  {/* SUB-SECTION COLLAPSIBLE: FINE-TUNING POSISI TAHUN & BADGE */}
                   <div className="mt-3 border border-amber-300 bg-amber-50/40 rounded-none overflow-hidden">
                     <button
                       type="button"
@@ -732,9 +934,9 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     >
                       <div className="flex items-center gap-1.5 text-zinc-900 font-bold text-[11px] uppercase tracking-wider">
                         <Sliders className="w-3.5 h-3.5 text-amber-700" />
-                        <span>Pengaturan Posisi &amp; Tipografi Tahun (Fine-Tuning)</span>
+                        <span>Fine-Tuning Posisi Tahun &amp; Badge</span>
                       </div>
-                      <div className="flex items-center gap-1 text-zinc-600 font-mono text-[10px]">
+                      <div className="flex items-center gap-1 text-zinc-600 font-sans text-[10px]">
                         <span>{fineTuneOpen ? 'Tutup' : 'Buka'}</span>
                         {fineTuneOpen ? (
                           <ChevronDown className="w-3.5 h-3.5 text-zinc-700" />
@@ -747,49 +949,17 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     {fineTuneOpen && (
                       <div className="p-3 space-y-3 bg-white border-t border-amber-200 text-xs">
                         <p className="text-[10px] text-zinc-600 leading-relaxed">
-                          Atur posisi presisi koordinat (X &amp; Y), ukuran tipografi tahun, dan perataan vertikal agar tidak bertubrukan dengan judul atau ornamen dekoratif.
+                          Atur posisi presisi koordinat (X &amp; Y), ukuran tipografi tahun, dan visibilitas badge akreditasi agar selaras dengan grid sampul.
                         </p>
 
-                        {/* 1. Posisi Vertikal (Y-Offset) */}
+                        {/* 1. Slider X-Offset */}
                         <div>
                           <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-mono uppercase text-zinc-700 font-bold">
-                              Posisi Vertikal (Y-Offset)
+                            <label className="text-[10px] font-sans uppercase text-zinc-700 font-bold">
+                              Slider X-Offset
                             </label>
-                            <span className="text-[10px] font-mono text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
-                              {currentFineTune.yOffset > 0 ? `+${currentFineTune.yOffset}` : currentFineTune.yOffset}px
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="range"
-                              min={-50}
-                              max={50}
-                              step={1}
-                              value={currentFineTune.yOffset}
-                              onChange={(e) => updateFineTune({ yOffset: Number(e.target.value) })}
-                              className="flex-1 accent-amber-600 cursor-pointer"
-                            />
-                            <input
-                              type="number"
-                              min={-50}
-                              max={50}
-                              value={currentFineTune.yOffset}
-                              onChange={(e) => updateFineTune({ yOffset: Number(e.target.value) })}
-                              className="w-16 px-1.5 py-1 border border-zinc-300 font-mono text-[11px] text-center focus:border-amber-500 focus:outline-none"
-                            />
-                          </div>
-                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: -50px sampai +50px (default: 0px)</span>
-                        </div>
-
-                        {/* 2. Posisi Horizontal (X-Offset) */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-mono uppercase text-zinc-700 font-bold">
-                              Posisi Horizontal (X-Offset)
-                            </label>
-                            <span className="text-[10px] font-mono text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
-                              {currentFineTune.xOffset > 0 ? `+${currentFineTune.xOffset}` : currentFineTune.xOffset}px
+                            <span className="text-[10px] font-sans text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
+                              {yearOffsetX > 0 ? `+${yearOffsetX}` : yearOffsetX}px
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -798,57 +968,92 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               min={-100}
                               max={50}
                               step={1}
-                              value={currentFineTune.xOffset}
-                              onChange={(e) => updateFineTune({ xOffset: Number(e.target.value) })}
+                              value={yearOffsetX}
+                              onChange={(e) => updateFineTune({ yearOffsetX: Number(e.target.value) })}
                               className="flex-1 accent-amber-600 cursor-pointer"
                             />
                             <input
                               type="number"
                               min={-100}
                               max={50}
-                              value={currentFineTune.xOffset}
-                              onChange={(e) => updateFineTune({ xOffset: Number(e.target.value) })}
-                              className="w-16 px-1.5 py-1 border border-zinc-300 font-mono text-[11px] text-center focus:border-amber-500 focus:outline-none"
+                              step={1}
+                              value={yearOffsetX}
+                              onChange={(e) => updateFineTune({ yearOffsetX: Number(e.target.value) })}
+                              className="w-16 px-1.5 py-1 border border-zinc-300 font-sans text-[11px] text-center focus:border-amber-500 focus:outline-none"
                             />
                           </div>
-                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: -100px (geser ke kiri) sampai +50px (kanan)</span>
+                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: -100px sampai +50px (step 1px)</span>
                         </div>
 
-                        {/* 3. Ukuran Font Tahun (Font Size) */}
+                        {/* 2. Slider Y-Offset */}
                         <div>
                           <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-mono uppercase text-zinc-700 font-bold">
-                              Ukuran Font Tahun (Font Size)
+                            <label className="text-[10px] font-sans uppercase text-zinc-700 font-bold">
+                              Slider Y-Offset
                             </label>
-                            <span className="text-[10px] font-mono text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
-                              {currentFineTune.fontSize}px
+                            <span className="text-[10px] font-sans text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
+                              {yearOffsetY > 0 ? `+${yearOffsetY}` : yearOffsetY}px
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <input
                               type="range"
-                              min={18}
-                              max={40}
+                              min={-60}
+                              max={60}
                               step={1}
-                              value={currentFineTune.fontSize}
-                              onChange={(e) => updateFineTune({ fontSize: Number(e.target.value) })}
+                              value={yearOffsetY}
+                              onChange={(e) => updateFineTune({ yearOffsetY: Number(e.target.value) })}
                               className="flex-1 accent-amber-600 cursor-pointer"
                             />
                             <input
                               type="number"
-                              min={18}
-                              max={40}
-                              value={currentFineTune.fontSize}
-                              onChange={(e) => updateFineTune({ fontSize: Number(e.target.value) })}
-                              className="w-16 px-1.5 py-1 border border-zinc-300 font-mono text-[11px] text-center focus:border-amber-500 focus:outline-none"
+                              min={-60}
+                              max={60}
+                              step={1}
+                              value={yearOffsetY}
+                              onChange={(e) => updateFineTune({ yearOffsetY: Number(e.target.value) })}
+                              className="w-16 px-1.5 py-1 border border-zinc-300 font-sans text-[11px] text-center focus:border-amber-500 focus:outline-none"
                             />
                           </div>
-                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: 18px sampai 40px (default tema: 28px)</span>
+                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: -60px sampai +60px (step 1px)</span>
+                        </div>
+
+                        {/* 3. Slider Font Size */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-sans uppercase text-zinc-700 font-bold">
+                              Slider Font Size
+                            </label>
+                            <span className="text-[10px] font-sans text-amber-800 font-bold bg-amber-50 px-1.5 py-0.5 border border-amber-200">
+                              {yearFontSize}px
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              min={16}
+                              max={40}
+                              step={1}
+                              value={yearFontSize}
+                              onChange={(e) => updateFineTune({ yearFontSize: Number(e.target.value) })}
+                              className="flex-1 accent-amber-600 cursor-pointer"
+                            />
+                            <input
+                              type="number"
+                              min={16}
+                              max={40}
+                              step={1}
+                              value={yearFontSize}
+                              onChange={(e) => updateFineTune({ yearFontSize: Number(e.target.value) })}
+                              className="w-16 px-1.5 py-1 border border-zinc-300 font-sans text-[11px] text-center focus:border-amber-500 focus:outline-none"
+                            />
+                          </div>
+                          <span className="text-[9px] text-zinc-400 block mt-0.5">Rentang: 16px sampai 40px (step 1px)</span>
                         </div>
 
                         {/* 4. Perataan Vertikal (Vertical Align) */}
                         <div>
-                          <label className="block text-[10px] font-mono uppercase text-zinc-700 font-bold mb-1">
+                          <label className="block text-[10px] font-sans uppercase text-zinc-700 font-bold mb-1">
                             Perataan Vertikal (Vertical Align)
                           </label>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
@@ -876,7 +1081,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         {/* 5. Switch / Toggle: Tampilkan Badge Akreditasi */}
                         <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
                           <div>
-                            <span className="text-[10px] font-mono uppercase font-bold text-zinc-800 block">
+                            <span className="text-[10px] font-sans uppercase font-bold text-zinc-800 block">
                               Tampilkan Badge Akreditasi
                             </span>
                             <span className="text-[9px] text-zinc-500">
@@ -885,20 +1090,22 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           </div>
                           <button
                             type="button"
-                            onClick={() => updateFineTune({ showBadge: currentFineTune.showBadge === false })}
+                            role="switch"
+                            aria-checked={showBadge}
+                            onClick={() => updateFineTune({ showBadge: !showBadge })}
                             className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                              currentFineTune.showBadge !== false ? 'bg-amber-500' : 'bg-zinc-300'
+                              showBadge ? 'bg-amber-500' : 'bg-zinc-300'
                             }`}
                           >
                             <span
                               className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                currentFineTune.showBadge !== false ? 'translate-x-4' : 'translate-x-0'
+                                showBadge ? 'translate-x-4' : 'translate-x-0'
                               }`}
                             />
                           </button>
                         </div>
 
-                        {/* 6. Tombol Reset Posisi Elemen */}
+                        {/* 6. Tombol Reset Posisi Default */}
                         <div className="pt-2 border-t border-zinc-200">
                           <button
                             type="button"
@@ -906,7 +1113,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             className="w-full py-2 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
                             <RefreshCw className="w-3.5 h-3.5 text-amber-700" />
-                            <span>🔄 Reset Tata Letak ke Default Tema</span>
+                            <span>Reset Posisi Default</span>
                           </button>
                         </div>
                       </div>
@@ -916,7 +1123,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[10px] font-mono uppercase text-zinc-600">
+                    <label className="block text-[10px] font-sans uppercase text-zinc-600">
                       Deskripsi Pengantar Sampul (Lead Paragraph)
                     </label>
                     <button
@@ -927,7 +1134,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           'Monograf arsitektural dan portofolio rekayasa konstruksi terintegrasi dengan standar kepatuhan teknis, presisi struktural, dan tata kelola berintegritas tinggi.'
                         )
                       }
-                      className="text-[9px] text-amber-700 hover:underline font-mono"
+                      className="text-[9px] text-amber-700 hover:underline font-sans"
                     >
                       Reset Default
                     </button>
@@ -950,7 +1157,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 bg-zinc-50 border border-zinc-200 space-y-3">
                 <div className="text-[11px] font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-200 pb-1.5 flex items-center justify-between">
                   <span>Foto Hero Arsitektur Sampul</span>
-                  <span className="text-[10px] text-amber-600 font-mono">16:9 RATIO</span>
+                  <span className="text-[10px] text-amber-600 font-sans">16:9 RATIO</span>
                 </div>
 
                 {/* Thumbnail Preview */}
@@ -963,7 +1170,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center text-white text-xs">
                     Foto Sampul Aktif
                   </div>
-                  <div className="absolute top-2 left-2 bg-black/70 text-white text-[9px] font-mono px-2 py-0.5">
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-[9px] font-sans px-2 py-0.5">
                     HERO COVER
                   </div>
                 </div>
@@ -993,7 +1200,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                 {/* Direct Image URL input */}
                 <div>
-                  <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                  <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                     URL Foto Arsitektur (Direct Web Link)
                   </label>
                   <div className="flex gap-1.5">
@@ -1002,7 +1209,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                       value={data.coverPhotoUrl || data.portfolio.flagship.photoUrl}
                       onChange={(e) => updateField('coverPhotoUrl', e.target.value)}
                       placeholder="https://images.unsplash.com/..."
-                      className="flex-1 px-2 py-1.5 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-mono"
+                      className="flex-1 px-2 py-1.5 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-sans"
                     />
                     <button
                       type="button"
@@ -1012,7 +1219,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           'https://images.unsplash.com/photo-1541888946425-d0fbb1861564?auto=format&fit=crop&w=1600&q=85'
                         )
                       }
-                      className="px-2 py-1 bg-zinc-200 hover:bg-zinc-300 text-zinc-700 text-[10px] font-mono"
+                      className="px-2 py-1 bg-zinc-200 hover:bg-zinc-300 text-zinc-700 text-[10px] font-sans"
                       title="Reset URL ke Menara SCBD default"
                     >
                       Default
@@ -1022,7 +1229,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                 {/* Quick Presets Curated Architecture Images */}
                 <div>
-                  <span className="block text-[10px] font-mono uppercase text-zinc-500 mb-1.5">
+                  <span className="block text-[10px] font-sans uppercase text-zinc-500 mb-1.5">
                     Pilihan Preset Foto Arsitektur Resolusi Tinggi:
                   </span>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1066,7 +1273,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 bg-zinc-50 border border-zinc-200 space-y-3">
                 <div className="text-[11px] font-bold text-zinc-800 uppercase tracking-wider border-b border-zinc-200 pb-1.5 flex items-center justify-between">
                   <span>Metrik Statistik Cepat Cover</span>
-                  <span className="text-[10px] text-amber-600 font-mono">4 INDIKATOR</span>
+                  <span className="text-[10px] text-amber-600 font-sans">4 INDIKATOR</span>
                 </div>
                 <p className="text-[10px] text-zinc-500">
                   Nilai statistik ini tampil di banner bawah Halaman Sampul (Cover). Anda dapat mengubah angka, label, atau keterangannya langsung:
@@ -1079,16 +1286,16 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                       className="p-2.5 bg-white border border-zinc-200 space-y-1.5 shadow-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold text-amber-700 uppercase">
+                        <span className="text-[10px] font-sans font-bold text-amber-700 uppercase">
                           Indikator {idx + 1}
                         </span>
-                        <span className="text-[10px] font-mono text-zinc-400">
+                        <span className="text-[10px] font-sans text-zinc-400">
                           {st.id}
                         </span>
                       </div>
                       <div className="grid grid-cols-12 gap-2">
                         <div className="col-span-5">
-                          <label className="block text-[9px] font-mono uppercase text-zinc-500">
+                          <label className="block text-[9px] font-sans uppercase text-zinc-500">
                             Angka / Nilai
                           </label>
                           <input
@@ -1096,11 +1303,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             value={st.value}
                             onChange={(e) => updateStatItem(idx, 'value', e.target.value)}
                             placeholder="180+"
-                            className="w-full px-2 py-1 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-mono font-bold"
+                            className="w-full px-2 py-1 border border-zinc-300 focus:border-amber-500 focus:outline-none text-xs font-sans font-bold"
                           />
                         </div>
                         <div className="col-span-7">
-                          <label className="block text-[9px] font-mono uppercase text-zinc-500">
+                          <label className="block text-[9px] font-sans uppercase text-zinc-500">
                             Label Indikator
                           </label>
                           <input
@@ -1113,7 +1320,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[9px] font-mono uppercase text-zinc-500">
+                        <label className="block text-[9px] font-sans uppercase text-zinc-500">
                           Sub-label / Keterangan Singkat
                         </label>
                         <input
@@ -1135,7 +1342,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           {activeTab === 'themes' && (
             <div className="space-y-4">
               <div className="p-3 bg-zinc-900 text-white border-l-4 border-amber-400">
-                <span className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                <span className="font-sans text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
                   SISTEM STRUKTUR TATA LETAK & ELEMEN GRAFIS
                 </span>
                 <p className="text-[11px] text-zinc-300 mt-1 leading-relaxed">
@@ -1164,12 +1371,12 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             className="w-4 h-4 rounded-xs shrink-0 border border-black/20"
                             style={{ backgroundColor: th.accentColor }}
                           />
-                          <span className="font-mono text-[10px] font-bold text-zinc-500 uppercase">
+                          <span className="font-sans text-[10px] font-bold text-zinc-500 uppercase">
                             TEMA 0{index + 1}
                           </span>
                         </div>
                         {isSelected && (
-                          <span className="bg-[#1c1917] text-white font-mono text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider flex items-center gap-1">
+                          <span className="bg-[#1c1917] text-white font-sans text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider flex items-center gap-1">
                             <Check className="w-3 h-3 text-emerald-400" /> AKTIF
                           </span>
                         )}
@@ -1189,7 +1396,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                       </div>
 
                       {/* Graphic Features Tags */}
-                      <div className="mt-2.5 flex flex-wrap gap-1 font-mono text-[9px]">
+                      <div className="mt-2.5 flex flex-wrap gap-1 font-sans text-[9px]">
                         {th.id === 'tech-navy' && (
                           <>
                             <span className="bg-slate-900 text-emerald-400 px-1.5 py-0.5 border border-emerald-900">Navy Gelap (#0f172a)</span>
@@ -1258,7 +1465,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           {activeTab === 'toggles' && (
             <div className="space-y-4">
               <div className="p-3 bg-amber-50 border border-amber-200">
-                <span className="font-mono text-[10px] text-amber-900 font-bold uppercase tracking-wider block">
+                <span className="font-sans text-[10px] text-amber-900 font-bold uppercase tracking-wider block">
                   ADAPTIVE ZERO-GAP REFLOW ENGINE
                 </span>
                 <p className="text-[11px] text-amber-800 mt-1">
@@ -1273,7 +1480,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     <div className="font-bold text-[#1c1917] flex items-center gap-1.5">
                       <span>01. Sambutan Direktur</span>
                       {!toggles.showDirectorMessage && (
-                        <span className="bg-[#1c1917] text-[#f59e0b] font-mono text-[9px] px-1 py-0.2 uppercase">
+                        <span className="bg-[#1c1917] text-[#f59e0b] font-sans text-[9px] px-1 py-0.2 uppercase">
                           REFLOW FULL-WIDTH
                         </span>
                       )}
@@ -1415,7 +1622,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 <button
                   type="button"
                   onClick={onToggleAmberAccent}
-                  className="w-full py-2 px-3 border border-[#1c1917] bg-white hover:bg-[#1c1917] hover:text-[#f59e0b] font-mono text-[11px] font-bold uppercase transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 px-3 border border-[#1c1917] bg-white hover:bg-[#1c1917] hover:text-[#f59e0b] font-sans text-[11px] font-bold uppercase transition-colors flex items-center justify-center gap-2"
                 >
                   <span className="w-2.5 h-2.5 bg-[#f59e0b] inline-block"></span>
                   {amberAccent ? 'AKTIF: HAZARD AMBER' : 'AKTIF: CARBON MONOCHROME'}
@@ -1437,7 +1644,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               {/* Header Card */}
               <div className="p-3 bg-zinc-900 text-white border-l-4 border-emerald-500">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">
+                  <span className="font-sans text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">
                     02. TENTANG KAMI &amp; VISI-MISI STRATEGIS
                   </span>
                   <button
@@ -1455,7 +1662,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
               {/* Paragraf Pengantar Bab 02 (Lead Manifesto) */}
               <div className="p-3 bg-zinc-50 border border-zinc-200 space-y-2">
-                <label className="block text-[10px] font-mono uppercase text-zinc-600 font-bold">
+                <label className="block text-[10px] font-sans uppercase text-zinc-600 font-bold">
                   Paragraf Pengantar Bab 02 (Lead Manifesto)
                 </label>
                 <textarea
@@ -1493,7 +1700,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                   <div className="space-y-3 pt-1">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                        <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                           Nama Direktur Utama
                         </label>
                         <input
@@ -1509,7 +1716,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                        <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                           Jabatan Resmi
                         </label>
                         <input
@@ -1528,7 +1735,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                        <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                           Nomor Registrasi BAPEKAN
                         </label>
                         <input
@@ -1540,11 +1747,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               director: { ...data.director, regNo: e.target.value },
                             })
                           }
-                          className="w-full px-2 py-1.5 border border-zinc-300 focus:border-emerald-500 focus:outline-none text-xs font-mono"
+                          className="w-full px-2 py-1.5 border border-zinc-300 focus:border-emerald-500 focus:outline-none text-xs font-sans"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                        <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                           Label Lencana Sudut Foto
                         </label>
                         <input
@@ -1556,13 +1763,13 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               director: { ...data.director, badge: e.target.value },
                             })
                           }
-                          className="w-full px-2 py-1.5 border border-zinc-300 focus:border-emerald-500 focus:outline-none text-xs font-mono"
+                          className="w-full px-2 py-1.5 border border-zinc-300 focus:border-emerald-500 focus:outline-none text-xs font-sans"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Kutipan Utama (Lead Quote)
                       </label>
                       <textarea
@@ -1579,7 +1786,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Isi Teks Sambutan (Paragraf 1)
                       </label>
                       <textarea
@@ -1596,7 +1803,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Isi Teks Sambutan (Paragraf 2 - Muncul saat Ekspansi)
                       </label>
                       <textarea
@@ -1614,7 +1821,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                     {/* Foto Direktur */}
                     <div className="pt-2 border-t border-zinc-200">
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1.5 font-bold">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1.5 font-bold">
                         Foto Resmi Direktur Utama
                       </label>
                       <div className="flex items-center gap-3">
@@ -1648,7 +1855,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                                   },
                                 })
                               }
-                              className="px-2 py-1 border border-zinc-300 bg-white hover:bg-zinc-100 text-[10px] text-zinc-600 font-mono"
+                              className="px-2 py-1 border border-zinc-300 bg-white hover:bg-zinc-100 text-[10px] text-zinc-600 font-sans"
                             >
                               Reset Default
                             </button>
@@ -1663,7 +1870,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               })
                             }
                             placeholder="URL Foto..."
-                            className="w-full px-2 py-1 border border-zinc-300 text-[10px] font-mono"
+                            className="w-full px-2 py-1 border border-zinc-300 text-[10px] font-sans"
                           />
                         </div>
                       </div>
@@ -1671,7 +1878,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                     {/* Tanda Tangan Direktur */}
                     <div className="pt-2 border-t border-zinc-200">
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1.5 font-bold">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1.5 font-bold">
                         Tanda Tangan Digital Direktur
                       </label>
                       <div className="flex items-center gap-3">
@@ -1683,7 +1890,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               className="h-full w-auto object-contain"
                             />
                           ) : (
-                            <span className="text-[9px] text-zinc-400 font-mono italic">Belum Ada</span>
+                            <span className="text-[9px] text-zinc-400 font-sans italic">Belum Ada</span>
                           )}
                         </div>
                         <div className="flex-1 space-y-1.5">
@@ -1707,7 +1914,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                                     director: { ...data.director, signatureUrl: undefined },
                                   })
                                 }
-                                className="px-2 py-1 border border-rose-200 text-rose-700 hover:bg-rose-50 text-[10px] font-mono"
+                                className="px-2 py-1 border border-rose-200 text-rose-700 hover:bg-rose-50 text-[10px] font-sans"
                               >
                                 Hapus TTD
                               </button>
@@ -1723,7 +1930,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               })
                             }
                             placeholder="URL Gambar TTD transparan..."
-                            className="w-full px-2 py-1 border border-zinc-300 text-[10px] font-mono"
+                            className="w-full px-2 py-1 border border-zinc-300 text-[10px] font-sans"
                           />
                         </div>
                       </div>
@@ -1764,7 +1971,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 {toggles.showVisionMission !== false && (
                   <div className="space-y-3 pt-1">
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1 font-bold">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1 font-bold">
                         Pernyataan Visi Utama 2035
                       </label>
                       <textarea
@@ -1785,7 +1992,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[9px] font-mono uppercase text-zinc-500 mb-1">
+                        <label className="block text-[9px] font-sans uppercase text-zinc-500 mb-1">
                           Target Emisi Karbon
                         </label>
                         <input
@@ -1800,11 +2007,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               },
                             })
                           }
-                          className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                          className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                         />
                       </div>
                       <div>
-                        <label className="block text-[9px] font-mono uppercase text-zinc-500 mb-1">
+                        <label className="block text-[9px] font-sans uppercase text-zinc-500 mb-1">
                           Target Implementasi BIM
                         </label>
                         <input
@@ -1819,7 +2026,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                               },
                             })
                           }
-                          className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                          className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                         />
                       </div>
                     </div>
@@ -1827,7 +2034,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     {/* Dynamic Mission Pillars (Pilar-Pilar Misi) */}
                     <div className="pt-2 border-t border-zinc-200">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono text-[10px] uppercase text-zinc-600 font-bold">
+                        <span className="font-sans text-[10px] uppercase text-zinc-600 font-bold">
                           Butir-Butir Misi Strategis ({data.visionMission.pillars.length} Pilar)
                         </span>
                         <button
@@ -1847,7 +2054,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             className="p-2.5 bg-white border border-zinc-300 space-y-1.5 shadow-xs"
                           >
                             <div className="flex justify-between items-center">
-                              <span className="font-mono text-[10px] font-bold text-emerald-700">
+                              <span className="font-sans text-[10px] font-bold text-emerald-700">
                                 PILAR 0{idx + 1}
                               </span>
                               <div className="flex items-center gap-2">
@@ -1856,7 +2063,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                                   value={pillar.category || pillar.tag}
                                   onChange={(e) => updateMissionPillar(idx, 'category', e.target.value)}
                                   placeholder="KATEGORI"
-                                  className="w-24 px-1.5 py-0.5 border border-zinc-200 text-[10px] font-mono uppercase text-right"
+                                  className="w-24 px-1.5 py-0.5 border border-zinc-200 text-[10px] font-sans uppercase text-right"
                                 />
                                 {data.visionMission.pillars.length > 1 && (
                                   <button
@@ -1917,7 +2124,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 {toggles.showHSEPolicy && (
                   <div className="space-y-2.5 pt-1">
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Judul Kebijakan Mutu &amp; K3
                       </label>
                       <input
@@ -1937,7 +2144,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Pernyataan Komitmen Kebijakan K3
                       </label>
                       <textarea
@@ -1961,7 +2168,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-mono uppercase text-zinc-600 mb-1">
+                      <label className="block text-[10px] font-sans uppercase text-zinc-600 mb-1">
                         Rekor Jam Kerja Selamat (Zero Accident / LTI)
                       </label>
                       <input
@@ -1977,7 +2184,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           })
                         }
                         placeholder="14.850.000 JAM KERJA TANPA KECELAKAAN (ZERO LTI)"
-                        className="w-full px-2.5 py-1.5 border border-zinc-300 font-mono text-xs font-bold text-emerald-800"
+                        className="w-full px-2.5 py-1.5 border border-zinc-300 font-sans text-xs font-bold text-emerald-800"
                       />
                     </div>
                   </div>
@@ -1990,7 +2197,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                   <span className="font-bold text-zinc-900 text-[11px] uppercase tracking-wider block">
                     4. Angka Metrik Capaian Singkat Halaman 02
                   </span>
-                  <span className="text-[10px] text-emerald-600 font-mono font-bold">FOOTER STATS</span>
+                  <span className="text-[10px] text-emerald-600 font-sans font-bold">FOOTER STATS</span>
                 </div>
                 <p className="text-[10px] text-zinc-500">
                   Data ini tersinkronisasi di baris capaian kaki halaman Bab 02:
@@ -1998,7 +2205,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[9px] font-mono uppercase text-zinc-500 mb-1">
+                    <label className="block text-[9px] font-sans uppercase text-zinc-500 mb-1">
                       Tahun Berdiri
                     </label>
                     <input
@@ -2014,12 +2221,12 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         })
                       }
                       placeholder="2008"
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono font-bold"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans font-bold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[9px] font-mono uppercase text-zinc-500 mb-1">
+                    <label className="block text-[9px] font-sans uppercase text-zinc-500 mb-1">
                       Jumlah Ahli
                     </label>
                     <input
@@ -2035,12 +2242,12 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         })
                       }
                       placeholder="480+"
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono font-bold"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans font-bold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[9px] font-mono uppercase text-zinc-500 mb-1">
+                    <label className="block text-[9px] font-sans uppercase text-zinc-500 mb-1">
                       Jam Kerja K3
                     </label>
                     <input
@@ -2056,7 +2263,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         })
                       }
                       placeholder="14.8M Jam"
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono font-bold"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans font-bold"
                     />
                   </div>
                 </div>
@@ -2075,16 +2282,16 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               )}
 
               <div>
-                <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold block mb-2">
+                <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold block mb-2">
                   Tier I Leadership (Dewan Direksi)
                 </span>
                 {data.team.tier1.map((member, idx) => (
                   <div key={member.id} className="p-3 bg-zinc-50 border border-zinc-200 mb-3 space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="font-mono text-[10px] text-[#f59e0b] font-bold">
+                      <span className="font-sans text-[10px] text-[#f59e0b] font-bold">
                         {member.code}
                       </span>
-                      <span className="font-mono text-[9px] text-zinc-500">{member.exp}</span>
+                      <span className="font-sans text-[9px] text-zinc-500">{member.exp}</span>
                     </div>
                     <input
                       type="text"
@@ -2126,14 +2333,14 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           team: { ...data.team, tier1: newTier1 },
                         });
                       }}
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                     />
                   </div>
                 ))}
               </div>
 
               <div className="border-t border-zinc-200 pt-3">
-                <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold block mb-2">
+                <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold block mb-2">
                   Metrik Kapasitas Enjiniring
                 </span>
                 <div className="grid grid-cols-2 gap-2">
@@ -2182,7 +2389,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold">
+                  <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold">
                     Tabel Manifes Lisensi Pemerintah
                   </span>
                   <button
@@ -2206,7 +2413,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         },
                       });
                     }}
-                    className="flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 bg-[#1c1917] text-[#f59e0b] font-bold"
+                    className="flex items-center gap-1 text-[10px] font-sans px-2 py-0.5 bg-[#1c1917] text-[#f59e0b] font-bold"
                   >
                     <Plus className="w-3 h-3" /> Tambah Baris
                   </button>
@@ -2230,7 +2437,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
 
-                      <div className="font-mono text-[10px] text-zinc-500 mb-1">BARIS {lic.no}</div>
+                      <div className="font-sans text-[10px] text-zinc-500 mb-1">BARIS {lic.no}</div>
                       <input
                         type="text"
                         placeholder="Nama Izin"
@@ -2257,7 +2464,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             legal: { ...data.legal, licenses: newLics },
                           });
                         }}
-                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono mb-1"
+                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans mb-1"
                       />
                       <input
                         type="text"
@@ -2279,7 +2486,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               </div>
 
               <div className="border-t border-zinc-200 pt-3">
-                <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold block mb-1">
+                <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold block mb-1">
                   Penandatangan Resmi Legal
                 </span>
                 <input
@@ -2331,7 +2538,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               )}
 
               <div>
-                <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold block mb-2">
+                <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold block mb-2">
                   Proyek Utama (Flagship Project)
                 </span>
                 <div className="p-3 bg-zinc-50 border border-zinc-200 space-y-2">
@@ -2372,7 +2579,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono font-bold"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans font-bold"
                     />
                   </div>
                   <div>
@@ -2392,23 +2599,23 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                      className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                     />
                   </div>
                 </div>
               </div>
 
               <div className="border-t border-zinc-200 pt-3">
-                <span className="font-mono text-[10px] uppercase text-zinc-500 font-bold block mb-2">
+                <span className="font-sans text-[10px] uppercase text-zinc-500 font-bold block mb-2">
                   4 Proyek Diversifikasi Sektoral
                 </span>
                 {data.portfolio.sectoralProjects.map((prj, idx) => (
                   <div key={prj.id} className="p-2.5 bg-zinc-50 border border-zinc-200 mb-2 space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="font-mono text-[9px] text-[#f59e0b] font-bold">
+                      <span className="font-sans text-[9px] text-[#f59e0b] font-bold">
                         {prj.sectorTag}
                       </span>
-                      <span className="font-mono text-[9px] text-zinc-500">{prj.city}</span>
+                      <span className="font-sans text-[9px] text-zinc-500">{prj.city}</span>
                     </div>
                     <input
                       type="text"
@@ -2443,7 +2650,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             },
                           });
                         }}
-                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                       />
                       <input
                         type="text"
@@ -2460,7 +2667,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             },
                           });
                         }}
-                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                       />
                     </div>
                     <div>
@@ -2479,7 +2686,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                             },
                           });
                         }}
-                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-mono"
+                        className="w-full px-2 py-1 border border-zinc-300 text-xs font-sans"
                       />
                     </div>
                   </div>
@@ -2498,54 +2705,11 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 '06'
               )}
 
-              {/* Top Status & Master Toggle Box */}
-              <div className="p-3.5 bg-zinc-900 text-white border-l-4 border-amber-400 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-amber-400"></span>
-                    <span className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-wider">
-                      BAB 06 // KONTAK &amp; PENUTUP (BACK COVER)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onSelectSpread('06')}
-                    className="px-2 py-0.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-mono text-[10px] font-bold uppercase flex items-center gap-1 transition-colors"
-                    title="Buka Halaman 06 pada Canvas"
-                  >
-                    <Eye className="w-3 h-3" />
-                    Buka Hal 06
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
-                  <div>
-                    <span className="font-bold text-xs block text-slate-100">
-                      Tampilkan Halaman Penutup (Back Cover)
-                    </span>
-                    <span className="text-[10px] text-zinc-400">
-                      {toggles.showBackCover !== false
-                        ? 'Halaman 06 Aktif & Muncul di Cetak PDF'
-                        : 'Halaman 06 Dinonaktifkan / Tersembunyi'}
-                    </span>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={toggles.showBackCover !== false}
-                      onChange={() => handleToggle('showBackCover')}
-                      className="sr-only peer"
-                    />
-                    <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:h-4 after:w-4 after:transition-all peer-checked:bg-[#f59e0b]"></div>
-                  </label>
-                </div>
-              </div>
-
               {/* 1. Slogan & Headline Penutup */}
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <FileText className="w-3.5 h-3.5 text-amber-500" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     1. Headline, Slogan &amp; Pernyataan Kemitraan
                   </span>
                 </div>
@@ -2566,7 +2730,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     }
                     className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs focus:outline-none focus:border-amber-500"
                   />
-                  <span className="text-[9px] text-zinc-400 mt-0.5 block font-mono">
+                  <span className="text-[9px] text-zinc-400 mt-0.5 block font-sans">
                     Teks display tebal di atas kotak CTA kemitraan resmi
                   </span>
                 </div>
@@ -2612,7 +2776,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     2. Foto Arsitektur Back Cover (~45% Tinggi)
                   </span>
                 </div>
@@ -2628,7 +2792,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     alt="Back cover preview"
                     className="w-full h-full object-cover filter grayscale contrast-125"
                   />
-                  <div className="absolute bottom-1 left-2 font-mono text-[9px] bg-black/80 text-white px-2 py-0.5">
+                  <div className="absolute bottom-1 left-2 font-sans text-[9px] bg-black/80 text-white px-2 py-0.5">
                     HEADQUARTERS &amp; STRATEGIC ASSETS // PREVIEW
                   </div>
                 </div>
@@ -2636,7 +2800,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 {/* File Upload & Input */}
                 <div className="space-y-2">
                   <div className="flex gap-2">
-                    <label className="flex-1 py-1.5 px-3 bg-[#1c1917] hover:bg-zinc-800 text-white font-mono text-[11px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                    <label className="flex-1 py-1.5 px-3 bg-[#1c1917] hover:bg-zinc-800 text-white font-sans text-[11px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
                       <Upload className="w-3.5 h-3.5 text-amber-400" />
                       <span>Unggah File Foto</span>
                       <input
@@ -2669,7 +2833,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           photoUrl: data.portfolio.flagship.photoUrl,
                         })
                       }
-                      className="px-2.5 py-1.5 border border-zinc-300 hover:bg-zinc-100 font-mono text-[10px] text-zinc-700 transition-colors"
+                      className="px-2.5 py-1.5 border border-zinc-300 hover:bg-zinc-100 font-sans text-[10px] text-zinc-700 transition-colors"
                       title="Gunakan foto yang sama dengan Proyek Utama"
                     >
                       Samakan Flagship
@@ -2677,7 +2841,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-0.5">
+                    <label className="block text-[10px] font-sans text-zinc-500 uppercase mb-0.5">
                       Atau Masukkan URL Gambar:
                     </label>
                     <input
@@ -2690,16 +2854,16 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           photoUrl: e.target.value,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   {/* Architectural Presets */}
                   <div>
-                    <span className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">
+                    <span className="block text-[10px] font-sans text-zinc-500 uppercase mb-1">
                       Pilihan Cepat Foto Arsitektur:
                     </span>
-                    <div className="grid grid-cols-2 gap-1.5 font-mono text-[10px]">
+                    <div className="grid grid-cols-2 gap-1.5 font-sans text-[10px]">
                       <button
                         type="button"
                         onClick={() =>
@@ -2761,7 +2925,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <MapPin className="w-3.5 h-3.5 text-rose-600" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     3. Alamat Kantor Pusat (Headquarters)
                   </span>
                 </div>
@@ -2842,7 +3006,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     4. Saluran Komunikasi &amp; Surel Resmi
                   </span>
                 </div>
@@ -2867,7 +3031,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -2890,7 +3054,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -2913,7 +3077,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -2930,7 +3094,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           tenderEmail: e.target.value,
                         })
                       }
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
@@ -2940,7 +3104,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <Globe className="w-3.5 h-3.5 text-indigo-600" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     5. Daftar Kantor Cabang (Regional Directory)
                   </span>
                 </div>
@@ -2967,18 +3131,18 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                         },
                       });
                     }}
-                    className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-mono focus:outline-none focus:border-amber-500"
+                    className="w-full px-2.5 py-1.5 border border-zinc-300 text-xs font-sans focus:outline-none focus:border-amber-500"
                   />
-                  <span className="text-[9px] text-zinc-400 mt-0.5 block font-mono">
+                  <span className="text-[9px] text-zinc-400 mt-0.5 block font-sans">
                     Pisahkan nama kota kantor cabang dengan tanda &quot;//&quot;
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="block text-[9px] font-mono text-zinc-500 uppercase">
+                  <span className="block text-[9px] font-sans text-zinc-500 uppercase">
                     Pilihan Format Cepat:
                   </span>
-                  <div className="flex flex-wrap gap-1 font-mono text-[9px]">
+                  <div className="flex flex-wrap gap-1 font-sans text-[9px]">
                     <button
                       type="button"
                       onClick={() => {
@@ -3029,14 +3193,14 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <div className="p-3 border border-zinc-200 bg-white space-y-3">
                 <div className="flex items-center gap-2 pb-1.5 border-b border-zinc-100">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#1c1917]">
+                  <span className="font-sans text-[10px] font-bold uppercase text-[#1c1917]">
                     6. Validasi Digital &amp; Kode Registrasi QR
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-0.5">
+                    <label className="block text-[10px] font-sans text-zinc-500 uppercase mb-0.5">
                       Kode Berkas Validasi:
                     </label>
                     <input
@@ -3054,12 +3218,12 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         })
                       }
-                      className="w-full px-2 py-1 border border-zinc-300 font-mono text-xs focus:outline-none focus:border-amber-500"
+                      className="w-full px-2 py-1 border border-zinc-300 font-sans text-xs focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-0.5">
+                    <label className="block text-[10px] font-sans text-zinc-500 uppercase mb-0.5">
                       Security Hash:
                     </label>
                     <input
@@ -3082,7 +3246,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                           },
                         });
                       }}
-                      className="w-full px-2 py-1 border border-zinc-300 font-mono text-xs focus:outline-none focus:border-amber-500"
+                      className="w-full px-2 py-1 border border-zinc-300 font-sans text-xs focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
@@ -3094,7 +3258,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           {activeTab === 'presets' && (
             <div className="space-y-4">
               <div className="p-3 bg-zinc-50 border border-zinc-200">
-                <span className="font-mono text-[10px] text-[#1c1917] font-bold uppercase block mb-1">
+                <span className="font-sans text-[10px] text-[#1c1917] font-bold uppercase block mb-1">
                   TEMPLATE PRESET INDUSTRI CEPAT
                 </span>
                 <p className="text-[11px] text-zinc-600 mb-3">
@@ -3111,7 +3275,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-bold text-[#1c1917] text-xs">{p.name}</span>
-                        <span className="font-mono text-[9px] bg-zinc-100 px-1.5 py-0.2 text-zinc-600">
+                        <span className="font-sans text-[9px] bg-zinc-100 px-1.5 py-0.2 text-zinc-600">
                           {p.tag}
                         </span>
                       </div>
@@ -3122,14 +3286,14 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               </div>
 
               <div className="space-y-2 pt-2 border-t border-zinc-200">
-                <span className="font-mono text-[10px] text-zinc-500 uppercase font-bold block">
+                <span className="font-sans text-[10px] text-zinc-500 uppercase font-bold block">
                   EKSPOR & IMPOR KONFIGURASI JSON
                 </span>
 
                 <button
                   type="button"
                   onClick={handleExportJson}
-                  className="w-full py-2 px-3 bg-[#1c1917] hover:bg-zinc-800 text-white font-mono text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-2 px-3 bg-[#1c1917] hover:bg-zinc-800 text-white font-sans text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <Download className="w-4 h-4 text-[#f59e0b]" />
                   Download Preset JSON
@@ -3138,7 +3302,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyJson}
-                  className="w-full py-2 px-3 border border-zinc-300 bg-white hover:bg-zinc-50 font-mono text-xs font-semibold flex items-center justify-center gap-2 transition-colors text-[#1c1917]"
+                  className="w-full py-2 px-3 border border-zinc-300 bg-white hover:bg-zinc-50 font-sans text-xs font-semibold flex items-center justify-center gap-2 transition-colors text-[#1c1917]"
                 >
                   {copiedNotification ? (
                     <>
@@ -3156,7 +3320,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setImportModalOpen(true)}
-                  className="w-full py-2 px-3 border border-[#f59e0b] bg-amber-50/50 hover:bg-amber-100/50 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-colors text-[#1c1917]"
+                  className="w-full py-2 px-3 border border-[#f59e0b] bg-amber-50/50 hover:bg-amber-100/50 font-sans text-xs font-bold flex items-center justify-center gap-2 transition-colors text-[#1c1917]"
                 >
                   <Upload className="w-4 h-4 text-[#f59e0b]" />
                   Import Preset JSON
@@ -3169,7 +3333,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                       onChange(defaultCompanyData);
                     }
                   }}
-                  className="w-full py-2 px-3 text-red-600 hover:bg-red-50 font-mono text-[11px] flex items-center justify-center gap-1.5 transition-colors border border-transparent hover:border-red-200"
+                  className="w-full py-2 px-3 text-red-600 hover:bg-red-50 font-sans text-[11px] flex items-center justify-center gap-1.5 transition-colors border border-transparent hover:border-red-200"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Reset ke Data Default
@@ -3180,7 +3344,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
         </div>
 
         {/* Editor Bottom Bar */}
-        <div className="p-3 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between text-zinc-500 font-mono text-[10px] shrink-0">
+        <div className="p-3 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between text-zinc-500 font-sans text-[10px] shrink-0">
           <span>REALTIME PREVIEW ENGINE</span>
           <span className="text-emerald-600 font-bold">● LIVE UPDATING</span>
         </div>
@@ -3188,12 +3352,12 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
       {/* IMPORT JSON MODAL */}
       {importModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="editor-modal font-sans fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-[#1c1917] max-w-lg w-full p-6 shadow-2xl relative">
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-zinc-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 bg-[#f59e0b]"></span>
-                <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-[#1c1917]">
+                <h3 className="font-sans text-sm font-bold uppercase tracking-wider text-[#1c1917]">
                   Import Preset JSON
                 </h3>
               </div>
@@ -3211,19 +3375,19 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
             </p>
 
             <div className="mb-4">
-              <label className="block text-[11px] font-mono uppercase text-zinc-600 mb-1">
+              <label className="block text-[11px] font-sans uppercase text-zinc-600 mb-1">
                 Pilih Berkas JSON:
               </label>
               <input
                 type="file"
                 accept=".json"
                 onChange={handleFileUpload}
-                className="w-full text-xs font-mono file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-[#1c1917] file:text-white file:text-xs file:font-mono file:cursor-pointer hover:file:bg-zinc-800"
+                className="w-full text-xs font-sans file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-[#1c1917] file:text-white file:text-xs file:font-sans file:cursor-pointer hover:file:bg-zinc-800"
               />
             </div>
 
             <div className="mb-4">
-              <label className="block text-[11px] font-mono uppercase text-zinc-600 mb-1">
+              <label className="block text-[11px] font-sans uppercase text-zinc-600 mb-1">
                 Atau Tempel Kode JSON:
               </label>
               <textarea
@@ -3231,10 +3395,10 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 value={importJsonText}
                 onChange={(e) => setImportJsonText(e.target.value)}
                 placeholder='{ "companyName": "...", "director": { ... } }'
-                className="w-full p-2 border border-zinc-300 font-mono text-[11px] focus:outline-none focus:border-[#f59e0b]"
+                className="w-full p-2 border border-zinc-300 font-sans text-[11px] focus:outline-none focus:border-[#f59e0b]"
               />
               {importError && (
-                <p className="text-xs text-red-600 mt-1 font-mono">{importError}</p>
+                <p className="text-xs text-red-600 mt-1 font-sans">{importError}</p>
               )}
             </div>
 
@@ -3242,7 +3406,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               <button
                 type="button"
                 onClick={() => setImportModalOpen(false)}
-                className="px-4 py-2 border border-zinc-300 text-xs font-mono uppercase hover:bg-zinc-100"
+                className="px-4 py-2 border border-zinc-300 text-xs font-sans uppercase hover:bg-zinc-100"
               >
                 Batal
               </button>
@@ -3250,7 +3414,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 type="button"
                 onClick={handleApplyImport}
                 disabled={!importJsonText.trim()}
-                className="px-4 py-2 bg-[#f59e0b] hover:bg-amber-600 text-[#1c1917] font-mono text-xs font-bold uppercase disabled:opacity-50"
+                className="px-4 py-2 bg-[#f59e0b] hover:bg-amber-600 text-[#1c1917] font-sans text-xs font-bold uppercase disabled:opacity-50"
               >
                 Terapkan Preset
               </button>

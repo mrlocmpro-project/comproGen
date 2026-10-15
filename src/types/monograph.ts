@@ -102,6 +102,9 @@ export interface CoverYearFineTune {
   fontSize: number;
   verticalAlign: YearVerticalAlign;
   showBadge: boolean;
+  yearOffsetX?: number;
+  yearOffsetY?: number;
+  yearFontSize?: number;
 }
 
 export interface PageVisibility {
@@ -130,6 +133,16 @@ export interface CompanyProfileData {
   coverDocumentType?: string;
   coverDescription?: string;
   coverPhotoUrl?: string;
+  yearOffsetX?: number;
+  yearOffsetY?: number;
+  yearFontSize?: number;
+  showBadge?: boolean;
+  showCover?: boolean;
+  showAbout?: boolean;
+  showTeam?: boolean;
+  showLegal?: boolean;
+  showPortfolio?: boolean;
+  showBackCover?: boolean;
   coverYearFineTune?: CoverYearFineTune;
   pageVisibility?: PageVisibility;
   stats: StatItem[];
@@ -252,15 +265,16 @@ export interface CompanyProfileData {
 }
 
 export interface TogglesState {
-  showCover?: boolean;
-  showAbout?: boolean;
+  showCover: boolean;
+  showAbout: boolean;
   showDirectorMessage: boolean;
   showVisionMission: boolean;
   showHSEPolicy: boolean;
   showTeam: boolean;
   showLegal: boolean;
+  showPortfolio: boolean;
   showProjects: boolean;
-  showBackCover?: boolean;
+  showBackCover: boolean;
 }
 
 export type SpreadId = '01' | '02' | '03' | '04' | '05' | '06' | 'all';

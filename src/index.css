@@ -97,6 +97,7 @@
 }
 
 /* Standard A4 Portrait Sheet Styling (1 : 1.414, 794px × 1123px) */
+.a4-page,
 .sheet-page {
   width: 100%;
   max-width: 794px;
@@ -107,58 +108,128 @@
   box-sizing: border-box;
 }
 
-/* Custom InDesign Sheet & Print Styling */
+/* =========================================================================
+   A4 PRINT & MONOGRAPH EXPORT RULES (@media print)
+   ========================================================================= */
 @media print {
   @page {
     size: A4 portrait;
     margin: 0;
   }
-  
-  .no-print {
+
+  /* 1. Hilangkan Halaman Kosong di Awal (Leading Blank Page):
+        Hilangkan seluruh elemen non-dokumen */
+  header,
+  nav,
+  aside,
+  footer,
+  section.no-print,
+  .editor-panel,
+  #floating-toolbar,
+  .no-print,
+  .sheet-disabled-placeholder,
+  [data-print-hidden="true"] {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
-  
+
+  /* Pastikan container root tidak membuat jarak atas */
+  body,
+  html,
+  #root,
+  #root > div,
+  main,
+  .spread-viewport-canvas,
+  .spread-viewport-canvas > div,
+  .dossier-print-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    gap: 0 !important;
+    row-gap: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    overflow: visible !important;
+    transform: none !important;
+    zoom: 1 !important;
+    display: block !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background: #ffffff !important;
-    padding: 0 !important;
-    margin: 0 !important;
   }
 
   #root {
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
-  .sheet-page {
-    width: 210mm !important;
-    height: 297mm !important;
-    max-width: 210mm !important;
-    min-height: 297mm !important;
-    max-height: 297mm !important;
-    page-break-after: always !important;
-    break-after: page !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-  }
-
+  /* 2. Style Isolasi Print & Pemisah Halaman Dinamis */
+  .a4-page,
+  .sheet-page,
   .page-spread {
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 auto !important;
+    box-sizing: border-box !important;
     width: 210mm !important;
-    height: 297mm !important;
-    page-break-after: always !important;
+    max-width: 210mm !important;
+    height: 295mm !important;
+    max-height: 295mm !important;
+    min-height: 295mm !important;
+    overflow: hidden !important;
+    break-before: page !important;
+    page-break-before: always !important;
     break-after: page !important;
-    page-break-inside: avoid !important;
+    page-break-after: always !important;
     break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    padding-bottom: 5mm !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  .a4-page:first-child,
+  .a4-page:first-of-type,
+  .sheet-page:first-child,
+  .sheet-page:first-of-type,
+  .page-spread:first-child,
+  .page-spread:first-of-type {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  .a4-page:last-child,
+  .a4-page:last-of-type,
+  .sheet-page:last-child,
+  .sheet-page:last-of-type,
+  .page-spread:last-child,
+  .page-spread:last-of-type {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Cegah inner container melebihi batas lembar cetak 295mm */
+  .a4-page > div,
+  .sheet-page > div,
+  .page-spread > div {
+    min-height: 0 !important;
+    max-height: 290mm !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -176,3 +247,79 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #78716c;
 }
+
+/* =========================================================================
+   UI APPLICATION & EDITOR MODERN CLEAN TYPOGRAPHY (Inter & Plus Jakarta Sans)
+   Strictly scoped to UI controls outside print/A4 sheets
+   ========================================================================= */
+.editor-panel,
+.editor-panel input,
+.editor-panel textarea,
+.editor-panel select,
+.editor-panel button,
+.editor-panel label,
+.editor-panel span,
+.editor-panel p,
+.editor-panel div,
+header.no-print,
+header.no-print *,
+.doc-info-bar,
+.doc-info-bar *,
+.editor-modal,
+.editor-modal * {
+  font-family: var(--font-body) !important;
+}
+
+.editor-panel h1,
+.editor-panel h2,
+.editor-panel h3,
+.editor-panel h4,
+.editor-panel h5,
+.editor-panel h6,
+.editor-panel .font-bold,
+.editor-panel .font-extrabold,
+.editor-panel .font-semibold,
+header.no-print .font-bold,
+header.no-print .font-black,
+header.no-print h1,
+header.no-print h2,
+header.no-print h3,
+.doc-info-bar .font-bold,
+.editor-modal h1,
+.editor-modal h2,
+.editor-modal h3,
+.editor-modal .font-bold {
+  font-family: var(--font-headline) !important;
+}
+
+/* =========================================================================
+   DOCUMENT DIRECT EDITABLE STYLING
+   ========================================================================= */
+.spread-viewport-canvas [contenteditable="true"] {
+  outline: none;
+  cursor: text;
+  transition: outline 0.15s ease, background-color 0.15s ease;
+}
+
+.spread-viewport-canvas [contenteditable="true"]:hover {
+  outline: 1px dashed rgba(245, 158, 11, 0.45);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.spread-viewport-canvas [contenteditable="true"]:focus {
+  outline: 1.5px solid #f59e0b;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media print {
+  .spread-viewport-canvas [contenteditable="true"],
+  .spread-viewport-canvas [contenteditable="true"]:hover,
+  .spread-viewport-canvas [contenteditable="true"]:focus {
+    outline: none !important;
+    background: transparent !important;
+  }
+}
+
+

@@ -8,6 +8,7 @@ import { CoverSageWireframe } from './cover/CoverSageWireframe';
 import { CoverRoyalSlant } from './cover/CoverRoyalSlant';
 import { CoverHexagonCharcoal } from './cover/CoverHexagonCharcoal';
 import { CoverCobaltSlash } from './cover/CoverCobaltSlash';
+import { EyeOff } from 'lucide-react';
 
 interface Spread01CoverProps {
   data: CompanyProfileData;
@@ -21,6 +22,23 @@ export const Spread01Cover: React.FC<Spread01CoverProps> = ({
   showGrid,
   themeId = 'tech-navy',
 }) => {
+  const isEnabled = data.pageVisibility?.cover ?? data.showCover ?? true;
+
+  if (!isEnabled) {
+    return (
+      <article className="sheet-disabled-placeholder w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
+        <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 mb-3 border border-amber-200">
+          <EyeOff className="w-6 h-6" />
+        </div>
+        <h3 className="font-headline text-base font-bold text-zinc-900 uppercase tracking-[-0.02em]">
+          HALAMAN 01 // HALAMAN SAMPUL (COVER) DINONAKTIFKAN
+        </h3>
+        <p className="font-editorial-body text-xs text-zinc-600 mt-2 max-w-md leading-relaxed">
+          Halaman sampul disembunyikan dari preview gabungan dan otomatis diabaikan saat ekspor cetak PDF (@media print). Aktifkan kembali melalui toggle di Tab Cover Panel Editor.
+        </p>
+      </article>
+    );
+  }
   switch (themeId) {
     case 'tech-navy':
       return <CoverTechNavy data={data} showGrid={showGrid} />;

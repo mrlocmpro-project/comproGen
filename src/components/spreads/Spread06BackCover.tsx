@@ -1,7 +1,8 @@
 import React from 'react';
 import { CompanyProfileData, ThemeId, TogglesState } from '../../types/monograph';
 import { CropMarks, GridOverlay } from '../common/CropMarks';
-import { Mail, Phone, Globe, MapPin, Building2, ShieldCheck, CheckCircle2, QrCode } from 'lucide-react';
+import { Mail, Phone, Globe, MapPin, Building2, ShieldCheck, CheckCircle2, QrCode, EyeOff } from 'lucide-react';
+import { getPageInfo } from '../../utils/pagination';
 
 interface Spread06BackCoverProps {
   data: CompanyProfileData;
@@ -64,17 +65,20 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   showGrid,
   themeId = 'tech-navy',
 }) => {
-  if (toggles && toggles.showBackCover === false) {
+  const isEnabled = data.pageVisibility?.backCover ?? toggles?.showBackCover ?? true;
+  const pageInfo = getPageInfo('backCover', data.pageVisibility || data, toggles);
+
+  if (!isEnabled) {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-white border border-zinc-200 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center print:hidden">
-        <div className="w-12 h-12 bg-amber-50 border border-amber-300 rounded-none flex items-center justify-center text-amber-600 mb-4">
-          <Building2 className="w-6 h-6" />
+      <article className="sheet-disabled-placeholder w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
+        <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 mb-3 border border-amber-200">
+          <EyeOff className="w-6 h-6" />
         </div>
-        <p className="font-headline text-base font-bold text-[#1c1917] tracking-[-0.02em]">
-          BAB 06 // HALAMAN PENUTUP (BACK COVER) DINONAKTIFKAN
-        </p>
-        <p className="font-editorial-body text-xs mt-2 max-w-md leading-[1.6]">
-          Halaman penutup disembunyikan. Untuk menampilkan kembali lembar ini pada monograf dan hasil cetak PDF, aktifkan tombol saklar pada tab &quot;Kontak &amp; Penutup&quot; atau &quot;Toggles&quot; di Panel Editor Kiri.
+        <h3 className="font-headline text-base font-bold text-zinc-900 uppercase tracking-[-0.02em]">
+          HALAMAN {pageInfo.sheetId} // HALAMAN PENUTUP (BACK COVER) DINONAKTIFKAN
+        </h3>
+        <p className="font-editorial-body text-xs text-zinc-600 mt-2 max-w-md leading-relaxed">
+          Halaman ini disembunyikan dari preview gabungan dan otomatis diabaikan saat ekspor cetak PDF (@media print). Aktifkan kembali melalui toggle di Panel Editor Kiri.
         </p>
       </article>
     );
@@ -99,8 +103,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'tech-navy') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0f172a] text-slate-100 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // BACK COVER MONOGRAPH" regText="TECH-NAVY // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0f172a] text-slate-100 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // BACK COVER MONOGRAPH" regText="TECH-NAVY // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         <div className="p-8 sm:p-10 flex flex-col justify-between relative z-10 min-h-[1123px] h-full box-border">
@@ -248,7 +252,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           {/* FOOTER */}
           <footer className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 shrink-0">
             <div>Publikasi Monograf Resmi // {data.companyName} // Hak Cipta Dilindungi</div>
-            <div className="font-folio-mono text-[10px] text-emerald-400">HALAMAN 06 DARI 06 // PENUTUP</div>
+            <div className="font-folio-mono text-[10px] text-emerald-400">{pageInfo.formattedIndo} // PENUTUP</div>
           </footer>
         </div>
       </article>
@@ -260,8 +264,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'swiss-tangerine') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // SWISS STRICT GRID" regText="SWISS-TANGERINE // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // SWISS STRICT GRID" regText="SWISS-TANGERINE // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         <div className="p-8 sm:p-10 flex flex-col justify-between relative z-10 min-h-[1123px] h-full box-border">
@@ -410,7 +414,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           <footer className="pt-3 border-t-2 border-black flex justify-between items-center text-xs font-bold shrink-0">
             <div>{data.companyName} // Monograf Selesai // Hak Cipta Dilindungi</div>
             <div className="font-folio-mono text-[10px] bg-black text-white px-2 py-0.5">
-              HALAMAN 06 / 06
+              {pageInfo.formattedLong}
             </div>
           </footer>
         </div>
@@ -423,8 +427,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'cyber-crimson') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0b0f19] text-white border border-slate-800 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // DARK EDITORIAL" regText="CYBER-CRIMSON // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0b0f19] text-white border border-slate-800 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // DARK EDITORIAL" regText="CYBER-CRIMSON // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         <div className="p-8 sm:p-10 flex flex-col justify-between relative z-10 min-h-[1123px] h-full box-border">
@@ -560,7 +564,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           {/* FOOTER */}
           <footer className="pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400 shrink-0">
             <div>{data.companyName} // 2028 // Hak Cipta Dilindungi</div>
-            <div className="font-folio-mono text-[10px] text-[#ff2d55]">HALAMAN 06 / 06</div>
+            <div className="font-folio-mono text-[10px] text-[#ff2d55]">{pageInfo.formattedLong}</div>
           </footer>
         </div>
       </article>
@@ -572,8 +576,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'scarlet-circle') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border border-slate-300 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // SCARLET EDITORIAL" regText="SCARLET-CIRCLE // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border border-slate-300 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // SCARLET EDITORIAL" regText="SCARLET-CIRCLE // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         <div className="p-8 sm:p-10 flex flex-col justify-between relative z-10 min-h-[1123px] h-full box-border">
@@ -715,7 +719,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           {/* FOOTER */}
           <footer className="pt-3 border-t-2 border-red-600 flex justify-between text-xs text-slate-700 font-medium shrink-0">
             <div>{data.companyName} // Bab 06 // Publikasi Resmi</div>
-            <div className="font-folio-mono text-[10px] font-bold text-red-600">HALAMAN 06 / 06</div>
+            <div className="font-folio-mono text-[10px] font-bold text-red-600">{pageInfo.formattedLong}</div>
           </footer>
         </div>
       </article>
@@ -727,8 +731,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'sage-wireframe') {
     return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-      <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // ARCHITECTURAL MONOGRAPH" regText="SAGE-WIREFRAME // CHAPTER 06" />
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+      <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // ARCHITECTURAL MONOGRAPH" regText="SAGE-WIREFRAME // CHAPTER 06" />
       <GridOverlay active={showGrid} />
 
       <div className="p-8 sm:p-10 flex flex-col justify-between relative z-10 min-h-[1123px] h-full box-border">
@@ -868,7 +872,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
         {/* FOOTER */}
         <footer className="pt-3 border-t border-[#d6ddd6] flex justify-between text-xs text-[#849688] shrink-0">
           <div>{data.companyName} // Penutup Monograf // Hak Cipta Dilindungi</div>
-          <div className="font-folio-mono text-[10px] text-[#627566]">HALAMAN 06 / 06</div>
+          <div className="font-folio-mono text-[10px] text-[#627566]">{pageInfo.formattedLong}</div>
         </footer>
       </div>
     </article>
@@ -880,8 +884,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'royal-slant') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // ROYAL SLANT SPEC" regText="ROYAL-SLANT // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // ROYAL SLANT SPEC" regText="ROYAL-SLANT // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         {/* Diagonal Hatched Accent Pattern */}
@@ -1033,7 +1037,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           {/* FOOTER */}
           <footer className="pt-3 border-t border-slate-300 flex justify-between text-xs text-slate-500 shrink-0">
             <div>{data.companyName} // Penutup Monograf // Hak Cipta Dilindungi</div>
-            <div className="font-folio-mono text-[10px] text-[#ea580c] font-bold">HALAMAN 06 / 06</div>
+            <div className="font-folio-mono text-[10px] text-[#ea580c] font-bold">{pageInfo.formattedLong}</div>
           </footer>
         </div>
       </article>
@@ -1045,8 +1049,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // -------------------------------------------------------------
   if (themeId === 'hexagon-charcoal') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fbfbfb] text-[#18181b] border-2 border-[#18181b] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-        <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // HEXAGON APEX SPEC" regText="HEXAGON-CHARCOAL // CHAPTER 06" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fbfbfb] text-[#18181b] border-2 border-[#18181b] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // HEXAGON APEX SPEC" regText="HEXAGON-CHARCOAL // CHAPTER 06" />
         <GridOverlay active={showGrid} />
 
         {/* Hexagon Angle Accent */}
@@ -1198,7 +1202,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
           {/* FOOTER */}
           <footer className="pt-3 border-t border-zinc-300 flex justify-between text-xs text-zinc-500 shrink-0">
             <div>{data.companyName} // Penutup Monograf // Hak Cipta Dilindungi</div>
-            <div className="font-folio-mono text-[10px] text-[#f97316] font-bold">HALAMAN 06 / 06</div>
+            <div className="font-folio-mono text-[10px] text-[#f97316] font-bold">{pageInfo.formattedLong}</div>
           </footer>
         </div>
       </article>
@@ -1209,8 +1213,8 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
   // THEME 8: COBALT DIAGONAL SLASH (Default fallback)
   // -------------------------------------------------------------
   return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
-      <CropMarks sheetId="06" bleedText="+ 210 × 297 MM // COBALT SLASH SPEC" regText="COBALT-SLASH // CHAPTER 06" />
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+      <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // COBALT SLASH SPEC" regText="COBALT-SLASH // CHAPTER 06" />
       <GridOverlay active={showGrid} />
 
       {/* Dynamic Cobalt Slash Ribbon */}
@@ -1359,7 +1363,7 @@ export const Spread06BackCover: React.FC<Spread06BackCoverProps> = ({
         {/* FOOTER */}
         <footer className="pt-3 border-t border-slate-300 flex justify-between text-xs text-slate-500 shrink-0">
           <div>{data.companyName} // Penutup Monograf // Hak Cipta Dilindungi</div>
-          <div className="font-folio-mono text-[10px] text-[#2563eb] font-bold">HALAMAN 06 / 06</div>
+          <div className="font-folio-mono text-[10px] text-[#2563eb] font-bold">{pageInfo.formattedLong}</div>
         </footer>
       </div>
     </article>

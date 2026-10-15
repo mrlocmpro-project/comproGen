@@ -27,6 +27,14 @@ export const CoverRoyalSlant: React.FC<Props> = ({ data, showGrid }) => {
     verticalAlign: 'top',
     showBadge: true,
   };
+  const yearOffsetX =
+    data.yearOffsetX ?? data.coverYearFineTune?.yearOffsetX ?? fineTune.xOffset ?? 0;
+  const yearOffsetY =
+    data.yearOffsetY ?? data.coverYearFineTune?.yearOffsetY ?? fineTune.yOffset ?? 0;
+  const yearFontSize =
+    data.yearFontSize ?? data.coverYearFineTune?.yearFontSize ?? fineTune.fontSize ?? 28;
+  const showBadge =
+    data.showBadge !== undefined ? data.showBadge : fineTune.showBadge !== false;
   const vAlign = fineTune.verticalAlign || 'top';
   const alignSelf =
     vAlign === 'middle' ? 'center' : vAlign === 'bottom' ? 'flex-end' : 'flex-start';
@@ -38,7 +46,7 @@ export const CoverRoyalSlant: React.FC<Props> = ({ data, showGrid }) => {
   const remainingWords = words.slice(1).join(' ') || 'PROFILE';
 
   return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
       <GridOverlay active={showGrid} />
 
       {/* GEOMETRIC ACCENT: Diagonal Hatched Pattern at Top-Right Corner */}
@@ -88,20 +96,21 @@ export const CoverRoyalSlant: React.FC<Props> = ({ data, showGrid }) => {
               className="min-w-0 flex flex-col items-end text-right relative z-20 overflow-visible pr-2 sm:pr-4"
               style={{
                 alignSelf,
-                transform: `translate(${fineTune.xOffset || 0}px, ${fineTune.yOffset || 0}px)`,
+                transform: `translate(${yearOffsetX}px, ${yearOffsetY}px)`,
+                fontSize: `${yearFontSize}px`,
               }}
             >
               <div
                 className="font-headline font-black text-[#1e3a8a] tracking-[-0.02em] leading-tight text-right whitespace-nowrap overflow-visible"
                 style={{
-                  fontSize: `${fineTune.fontSize || 28}px`,
+                  fontSize: `${yearFontSize}px`,
                   whiteSpace: 'nowrap',
                   overflow: 'visible',
                 }}
               >
                 {endYear ? `/ ${startYear} – ${endYear}` : `/ ${startYear}`}
               </div>
-              {fineTune.showBadge !== false && (
+              {showBadge && (
                 <div className="mt-2 flex justify-end self-end overflow-visible">
                   {/* Slanted Parallelogram Badge */}
                   <div className="transform -skew-x-12 bg-[#ea580c] text-white px-3 py-1 shadow-sm whitespace-nowrap">

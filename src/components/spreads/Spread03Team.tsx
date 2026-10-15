@@ -19,11 +19,11 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   themeId = 'tech-navy',
 }) => {
   const isEnabled = data.pageVisibility?.team ?? toggles.showTeam ?? true;
-  const pageInfo = getPageInfo('team', data.pageVisibility);
+  const pageInfo = getPageInfo('team', data.pageVisibility || data, toggles);
 
   if (!isEnabled) {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
+      <article className="sheet-disabled-placeholder w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
         <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 mb-3 border border-amber-200">
           <EyeOff className="w-6 h-6" />
         </div>
@@ -40,7 +40,7 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 1: TECH NAVY
   if (themeId === 'tech-navy') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0f172a] text-slate-100 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0f172a] text-slate-100 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
         <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // EDITORIAL DOSSIER" regText="TECH-NAVY // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
@@ -123,8 +123,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 2: SWISS EDITORIAL & TANGERINE
   if (themeId === 'swiss-tangerine') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // SWISS STRICT GRID" regText="SWISS-TANGERINE // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-white text-black border-2 border-black relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // SWISS STRICT GRID" regText="SWISS-TANGERINE // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         {/* MINIMALIST EDITORIAL HEADER (Hairline 1px) */}
@@ -203,8 +203,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 3: CYBER DARK & CRIMSON 2028
   if (themeId === 'cyber-crimson') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0b0f19] text-white border border-slate-800 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // DARK EDITORIAL" regText="CYBER-CRIMSON // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#0b0f19] text-white border border-slate-800 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // DARK EDITORIAL" regText="CYBER-CRIMSON // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         <div className="font-headline absolute top-4 right-8 text-[100px] font-extrabold text-[#ff2d55]/10 leading-none select-none pointer-events-none z-0">
@@ -279,8 +279,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 4: BOLD SCARLET CIRCLE
   if (themeId === 'scarlet-circle') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border border-slate-300 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // SCARLET EDITORIAL" regText="SCARLET-CIRCLE // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border border-slate-300 relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // SCARLET EDITORIAL" regText="SCARLET-CIRCLE // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         {/* MINIMALIST EDITORIAL HEADER (Hairline 1px) */}
@@ -346,8 +346,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 5: SAGE WIREFRAME MINIMALIST
   if (themeId === 'sage-wireframe') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // ARCHITECTURAL MONOGRAPH" regText="SAGE-WIREFRAME // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // ARCHITECTURAL MONOGRAPH" regText="SAGE-WIREFRAME // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         {/* MINIMALIST EDITORIAL HEADER (Hairline 1px) */}
@@ -422,8 +422,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // =========================================================================
   if (themeId === 'royal-slant') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // ROYAL SLANT SPEC" regText="ROYAL-SLANT // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-slate-50 text-slate-900 border-2 border-[#1e3a8a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // ROYAL SLANT SPEC" regText="ROYAL-SLANT // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         {/* Diagonal Hatched Accent Pattern */}
@@ -519,8 +519,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // =========================================================================
   if (themeId === 'hexagon-charcoal') {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fbfbfb] text-[#18181b] border-2 border-[#18181b] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-        <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // HEXAGON APEX SPEC" regText="HEXAGON-CHARCOAL // CHAPTER 03" />
+      <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fbfbfb] text-[#18181b] border-2 border-[#18181b] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+        <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // HEXAGON APEX SPEC" regText="HEXAGON-CHARCOAL // CHAPTER 03" />
         <GridOverlay active={showGrid} />
 
         {/* Hexagon Angle Accent */}
@@ -616,8 +616,8 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
   // THEME 8: COBALT DIAGONAL SLASH (Default fallback)
   // =========================================================================
   return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
-      <CropMarks sheetId="03" bleedText="+ 210 × 297 MM // COBALT SLASH SPEC" regText="COBALT-SLASH // CHAPTER 03" />
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto p-8 sm:p-10 flex flex-col justify-between font-sans">
+      <CropMarks sheetId={pageInfo.sheetId} bleedText="+ 210 × 297 MM // COBALT SLASH SPEC" regText="COBALT-SLASH // CHAPTER 03" />
       <GridOverlay active={showGrid} />
 
       {/* Dynamic Cobalt Slash Ribbon */}
@@ -695,7 +695,7 @@ export const Spread03Team: React.FC<Spread03TeamProps> = ({
       {/* MINIMALIST EDITORIAL FOOTER (Hairline 1px) */}
       <footer className="mt-4 pt-3 border-t border-slate-300 flex items-center justify-between text-[11px] font-folio-mono tracking-[0.08em] text-slate-500 shrink-0 relative z-10">
         <span>{data.contact.comms.website}</span>
-        <span className="font-bold text-[#2563eb]">03 / 06</span>
+        <span className="font-bold text-[#2563eb]">{pageInfo.formatted}</span>
       </footer>
     </article>
   );

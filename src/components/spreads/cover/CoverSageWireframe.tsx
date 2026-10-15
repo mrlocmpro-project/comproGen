@@ -25,12 +25,20 @@ export const CoverSageWireframe: React.FC<Props> = ({ data, showGrid }) => {
     verticalAlign: 'top',
     showBadge: true,
   };
+  const yearOffsetX =
+    data.yearOffsetX ?? data.coverYearFineTune?.yearOffsetX ?? fineTune.xOffset ?? 0;
+  const yearOffsetY =
+    data.yearOffsetY ?? data.coverYearFineTune?.yearOffsetY ?? fineTune.yOffset ?? 0;
+  const yearFontSize =
+    data.yearFontSize ?? data.coverYearFineTune?.yearFontSize ?? fineTune.fontSize ?? 28;
+  const showBadge =
+    data.showBadge !== undefined ? data.showBadge : fineTune.showBadge !== false;
   const vAlign = fineTune.verticalAlign || 'top';
   const alignSelf =
     vAlign === 'middle' ? 'center' : vAlign === 'bottom' ? 'flex-end' : 'flex-start';
 
   return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#fcfbf8] text-[#2c332e] border border-[#d6ddd6] relative overflow-hidden transition-all duration-300 shadow-xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
       <GridOverlay active={showGrid} />
 
       <div className="p-8 sm:p-10 pt-10 sm:pt-12 flex flex-col justify-between relative z-10 min-h-[1123px]">
@@ -59,20 +67,21 @@ export const CoverSageWireframe: React.FC<Props> = ({ data, showGrid }) => {
               className="min-w-0 flex flex-col items-end text-right relative z-20 overflow-visible"
               style={{
                 alignSelf,
-                transform: `translate(${fineTune.xOffset || 0}px, ${fineTune.yOffset || 0}px)`,
+                transform: `translate(${yearOffsetX}px, ${yearOffsetY}px)`,
+                fontSize: `${yearFontSize}px`,
               }}
             >
               <div
                 className="font-headline font-black text-[#1f2621] tracking-[-0.02em] leading-tight text-right whitespace-nowrap overflow-visible"
                 style={{
-                  fontSize: `${fineTune.fontSize || 28}px`,
+                  fontSize: `${yearFontSize}px`,
                   whiteSpace: 'nowrap',
                   overflow: 'visible',
                 }}
               >
                 {endYear ? `/ ${startYear} – ${endYear}` : `/ ${startYear}`}
               </div>
-              {fineTune.showBadge !== false && (
+              {showBadge && (
                 <div className="mt-2 flex justify-end self-end overflow-visible">
                   <span className="inline-block bg-[#627566] text-white px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-xs whitespace-nowrap">
                     TERAKREDITASI

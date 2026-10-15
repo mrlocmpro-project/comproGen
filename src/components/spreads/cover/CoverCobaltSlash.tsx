@@ -27,12 +27,20 @@ export const CoverCobaltSlash: React.FC<Props> = ({ data, showGrid }) => {
     verticalAlign: 'top',
     showBadge: true,
   };
+  const yearOffsetX =
+    data.yearOffsetX ?? data.coverYearFineTune?.yearOffsetX ?? fineTune.xOffset ?? 0;
+  const yearOffsetY =
+    data.yearOffsetY ?? data.coverYearFineTune?.yearOffsetY ?? fineTune.yOffset ?? 0;
+  const yearFontSize =
+    data.yearFontSize ?? data.coverYearFineTune?.yearFontSize ?? fineTune.fontSize ?? 28;
+  const showBadge =
+    data.showBadge !== undefined ? data.showBadge : fineTune.showBadge !== false;
   const vAlign = fineTune.verticalAlign || 'top';
   const alignSelf =
     vAlign === 'middle' ? 'center' : vAlign === 'bottom' ? 'flex-end' : 'flex-start';
 
   return (
-    <article className="sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
+    <article className="a4-page sheet-page page-spread w-full max-w-[794px] min-h-[1123px] bg-[#f8fafc] text-slate-900 border-2 border-[#0f172a] relative overflow-hidden transition-all duration-300 shadow-2xl print:shadow-none print:border-none print:m-0 mx-auto font-sans">
       <GridOverlay active={showGrid} />
 
       {/* GEOMETRIC ACCENT: Cobalt Diagonal Slash Ribbon Background Flairs */}
@@ -78,7 +86,8 @@ export const CoverCobaltSlash: React.FC<Props> = ({ data, showGrid }) => {
               className="min-w-0 flex flex-col items-end text-right relative z-20 overflow-visible pr-2"
               style={{
                 alignSelf,
-                transform: `translate(${fineTune.xOffset || 0}px, ${fineTune.yOffset || 0}px)`,
+                transform: `translate(${yearOffsetX}px, ${yearOffsetY}px)`,
+                fontSize: `${yearFontSize}px`,
               }}
             >
               {/* Slanted Parallelogram Year Container */}
@@ -86,7 +95,7 @@ export const CoverCobaltSlash: React.FC<Props> = ({ data, showGrid }) => {
                 <div
                   className="transform skew-x-12 font-headline font-black tracking-[-0.02em] whitespace-nowrap text-white overflow-visible"
                   style={{
-                    fontSize: `${fineTune.fontSize || 28}px`,
+                    fontSize: `${yearFontSize}px`,
                     whiteSpace: 'nowrap',
                     overflow: 'visible',
                   }}
@@ -96,7 +105,7 @@ export const CoverCobaltSlash: React.FC<Props> = ({ data, showGrid }) => {
               </div>
 
               {/* Accreditation Badge below */}
-              {fineTune.showBadge !== false && (
+              {showBadge && (
                 <div className="mt-2 flex justify-end self-end overflow-visible">
                   <span className="inline-block bg-[#2563eb] text-white px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider shadow-sm whitespace-nowrap">
                     TERAKREDITASI

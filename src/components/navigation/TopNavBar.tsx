@@ -58,14 +58,14 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-zinc-200 no-print">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-zinc-200 no-print font-sans">
       <div className="h-14 w-full px-3 md:px-6 flex items-center justify-between gap-3">
         {/* Left Zone: Editor Button & Monograph Badge */}
         <div className="flex items-center gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onToggleEditor}
-            className={`px-2.5 py-1.5 border font-mono text-xs font-bold uppercase transition-colors flex items-center gap-1.5 ${
+            className={`px-2.5 py-1.5 border font-sans text-xs font-bold uppercase transition-colors flex items-center gap-1.5 ${
               editorOpen
                 ? 'bg-[#1c1917] text-amber-400 border-[#1c1917]'
                 : 'bg-zinc-100 text-[#1c1917] border-zinc-300 hover:bg-zinc-200'
@@ -81,7 +81,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
             <button
               type="button"
               onClick={() => setThemeDropdownOpen((prev) => !prev)}
-              className="flex items-center gap-2 px-2.5 py-1.5 border border-zinc-300 hover:border-zinc-800 bg-zinc-50 hover:bg-white text-[#1c1917] font-mono text-xs font-bold transition-all shadow-xs"
+              className="flex items-center gap-2 px-2.5 py-1.5 border border-zinc-300 hover:border-zinc-800 bg-zinc-50 hover:bg-white text-[#1c1917] font-sans text-xs font-bold transition-all shadow-xs"
               title="Pilih Desain Struktur Tata Letak Monograf"
             >
               <span
@@ -95,7 +95,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
             </button>
 
             {themeDropdownOpen && (
-              <div className="absolute left-0 mt-1 w-72 sm:w-80 bg-white border-2 border-[#1c1917] shadow-xl z-50 py-1 font-mono text-xs">
+              <div className="absolute left-0 mt-1 w-72 sm:w-80 bg-white border-2 border-[#1c1917] shadow-xl z-50 py-1 font-sans text-xs">
                 <div className="px-3 py-2 bg-zinc-100 border-b border-zinc-200 text-[10px] uppercase font-bold text-zinc-600">
                   PILIH STRUKTUR DESAIN (5 DESAIN REFERENSI)
                 </div>
@@ -150,7 +150,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                 disabled={!isEnabled}
                 onClick={() => onSelectSpread(s.id)}
                 title={!isEnabled ? `${s.label} dinonaktifkan di panel editor` : s.label}
-                className={`px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 font-sans text-xs font-semibold uppercase tracking-wide transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
                   !isEnabled
                     ? 'opacity-40 line-through text-zinc-400 cursor-not-allowed bg-zinc-50 border border-dashed border-zinc-200 select-none'
                     : isActive
@@ -176,18 +176,18 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
             <button
               type="button"
               onClick={() => onZoomChange(-15)}
-              className="px-2 py-1 border-r border-zinc-300 text-zinc-600 hover:bg-zinc-100 hover:text-black transition-colors font-mono text-xs"
+              className="px-2 py-1 border-r border-zinc-300 text-zinc-600 hover:bg-zinc-100 hover:text-black transition-colors font-sans text-xs font-semibold"
               title="Perkecil Tampilan"
             >
               -
             </button>
-            <span className="px-2 py-1 font-mono text-[11px] text-[#1c1917] select-none min-w-[38px] text-center font-semibold">
+            <span className="px-2 py-1 font-sans text-xs text-[#1c1917] select-none min-w-[38px] text-center font-bold">
               {zoom}%
             </span>
             <button
               type="button"
               onClick={() => onZoomChange(15)}
-              className="px-2 py-1 text-zinc-600 hover:bg-zinc-100 hover:text-black transition-colors font-mono text-xs"
+              className="px-2 py-1 text-zinc-600 hover:bg-zinc-100 hover:text-black transition-colors font-sans text-xs font-semibold"
               title="Perbesar Tampilan"
             >
               +
@@ -198,7 +198,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           <button
             type="button"
             onClick={onToggleGrid}
-            className={`px-2.5 py-1.5 border font-mono text-xs uppercase tracking-wider transition-colors flex items-center gap-1 ${
+            className={`px-2.5 py-1.5 border font-sans text-xs uppercase tracking-wide transition-colors flex items-center gap-1 ${
               showGrid
                 ? 'bg-[#1c1917] text-white border-[#1c1917]'
                 : 'border-zinc-300 text-zinc-700 hover:bg-zinc-100'
@@ -213,7 +213,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           <button
             type="button"
             onClick={onPrint}
-            className="bg-[#1c1917] hover:bg-zinc-800 text-white font-mono text-xs font-black uppercase px-3 py-1.5 transition-colors border border-[#1c1917] flex items-center gap-1.5 shadow-sm"
+            className="bg-[#1c1917] hover:bg-zinc-800 text-white font-sans text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 transition-colors border border-[#1c1917] flex items-center gap-1.5 shadow-sm"
           >
             <Printer className="w-4 h-4 text-amber-400" />
             <span className="hidden sm:inline">PRINT (A4)</span>

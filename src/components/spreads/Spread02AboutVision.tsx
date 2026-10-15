@@ -25,17 +25,17 @@ export const Spread02AboutVision: React.FC<Spread02AboutVisionProps> = ({
   showGrid,
   themeId = 'tech-navy',
 }) => {
-  const isEnabled = data.pageVisibility?.about !== false;
-  const pageInfo = getPageInfo('about', data.pageVisibility);
+  const isEnabled = data.pageVisibility?.about ?? toggles.showAbout ?? true;
+  const pageInfo = getPageInfo('about', data.pageVisibility || data, toggles);
 
   if (!isEnabled) {
     return (
-      <article className="sheet-page page-spread w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
+      <article className="sheet-disabled-placeholder w-full max-w-[794px] min-h-[400px] bg-white border border-dashed border-zinc-300 p-12 text-center text-zinc-500 font-sans mx-auto flex flex-col justify-center items-center shadow-xs no-print print:hidden">
         <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 mb-3 border border-amber-200">
           <EyeOff className="w-6 h-6" />
         </div>
         <h3 className="font-headline text-base font-bold text-zinc-900 uppercase tracking-[-0.02em]">
-          HALAMAN 02 // TENTANG &amp; VISI DINONAKTIFKAN
+          HALAMAN {pageInfo.sheetId} // TENTANG &amp; VISI DINONAKTIFKAN
         </h3>
         <p className="font-editorial-body text-xs text-zinc-600 mt-2 max-w-md leading-relaxed">
           Halaman ini disembunyikan dari preview gabungan dan otomatis diabaikan saat ekspor cetak PDF (@media print). Aktifkan kembali melalui toggle di Panel Editor Kiri.
